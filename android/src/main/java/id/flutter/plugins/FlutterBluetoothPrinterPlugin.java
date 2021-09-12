@@ -6,6 +6,10 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -15,6 +19,7 @@ import androidx.annotation.NonNull;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +46,24 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         channel.setMethodCallHandler(this);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        flutterPluginBinding.getApplicationContext().registerReceiver(receiver, filter);
     }
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                final HashMap<String, Object> map = new HashMap<>();
+                map.put("name", device.getName());
+                map.put("address", device.getAddress());
+                map.put("type", device.getType());
+                channel.invokeMethod("didDiscover", map);
+            }
+        }
+    };
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
@@ -51,6 +73,20 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 isEnabled(result);
                 break;
 
+            case "startScan":
+                if (!bluetoothAdapter.isDiscovering()){
+                    bluetoothAdapter.startDiscovery();
+                }
+                result.success(true);
+                break;
+
+            case "stopScan":
+                if (bluetoothAdapter.isDiscovering()){
+                    bluetoothAdapter.cancelDiscovery();
+                }
+                result.success(true);
+                break;
+
 
             case "getBondedDevices":
                 getBondedDevices(result);
@@ -58,7 +94,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
             case "print": {
                 final String address = call.argument("address");
-                final ArrayList<Integer> arr = call.argument("data");
+                final String arr = call.argument("data");
 
                 print(address, arr, result);
             }
@@ -112,17 +148,13 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         result.success(results);
     }
 
-    private void print(String address, List<Integer> list, MethodChannel.Result result) {
+    private void print(String address, String base64, MethodChannel.Result result) {
         if (!isPermitted(result)) {
             return;
         }
 
         AsyncTask.execute(() -> {
-            byte[] bytes = new byte[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                bytes[i] = list.get(i).byteValue();
-            }
-
+            byte[] bytes = Base64.getDecoder().decode(base64);
             final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
             try {
                 // Standard SerialPortService ID

@@ -16,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<BluetoothDevice> _devices = [];
+  final List<BluetoothDevice> _devices = [];
 
   @override
   void initState() {
@@ -26,13 +26,13 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    List<BluetoothDevice> platformVersion;
+    //List<BluetoothDevice> platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion = await BluetoothPrinter.instance.getBondedDevices();
+      //platformVersion = await BluetoothPrinter.instance.getBondedDevices();
     } on PlatformException {
-      platformVersion = [];
+      //platformVersion = [];
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -40,9 +40,9 @@ class _MyAppState extends State<MyApp> {
     // setState to update our non-existent appearance.
     if (!mounted) return;
 
-    setState(() {
-      _devices = platformVersion;
-    });
+    // setState(() {
+    //   _devices = platformVersion;
+    // });
   }
 
   @override
