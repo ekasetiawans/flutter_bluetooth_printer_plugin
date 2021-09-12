@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -136,7 +138,9 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                result.success(true);
+                new Handler(Looper.getMainLooper()).post(()->{
+                    result.success(true);
+                });
             }
         });
     }
