@@ -14,12 +14,12 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 
 import androidx.annotation.NonNull;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,8 +94,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
             case "print": {
                 final String address = call.argument("address");
-                final String arr = call.argument("data");
-
+                final List<byte[]> arr = call.argument("data");
                 print(address, arr, result);
             }
             break;
@@ -148,13 +147,12 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         result.success(results);
     }
 
-    private void print(String address, String base64, MethodChannel.Result result) {
+    private void print(String address, List<byte[]> commands, MethodChannel.Result result) {
         if (!isPermitted(result)) {
             return;
         }
 
         AsyncTask.execute(() -> {
-            byte[] bytes = Base64.getDecoder().decode(base64);
             final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
             try {
                 // Standard SerialPortService ID
@@ -163,9 +161,11 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 mmSocket.connect();
                 OutputStream mmOutputStream = mmSocket.getOutputStream();
 
-                mmOutputStream.write(bytes);
-                mmOutputStream.flush();
+                for (byte[] bytes : commands) {
+                    mmOutputStream.write(bytes);
+                }
 
+                mmOutputStream.flush();
                 mmSocket.close();
             } catch (Exception e) {
                 e.printStackTrace();

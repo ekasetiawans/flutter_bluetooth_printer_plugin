@@ -19,7 +19,7 @@ public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, CBCent
     
     var centralManager: CBCentralManager? = nil
     var channel: FlutterMethodChannel
-    var data: String?
+    var data: [[UInt8]]?
     
     
     var devices: Dictionary<String, BluetoothPeripheral> = [:]
@@ -41,7 +41,8 @@ public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, CBCent
         
     case "startScan":
         if (centralManager?.state == CBManagerState.poweredOn && !(centralManager?.isScanning ?? false)){
-            centralManager?.scanForPeripherals(withServices: nil)
+            let serviceUUIDs = BluetoothPeripheral.specifiedServices.map { CBUUID(string: $0) }
+            centralManager?.scanForPeripherals(withServices: serviceUUIDs)
         }
         
         result(true)
@@ -59,11 +60,12 @@ public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, CBCent
     case "getBondedDevices":
         result([])
         break
+    
         
     case "print":
         let args = call.arguments as! Dictionary<String, Any>
         let uuidString = args["address"] as! String
-        let data = args["data"] as! String
+        let data = args["data"] as! [[UInt8]]
         
         let device = self.devices[uuidString];
         if (device != nil){
@@ -92,15 +94,14 @@ public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, CBCent
         let name = peripheral.name ?? ""
         let address = peripheral.identifier.uuidString
         
-        let device = BluetoothPeripheral(device: peripheral, name: name as NSString, address: address as NSString, type: 1, services: serviceUUIDs, central: centralManager!)
+        let device = BluetoothPeripheral(device: peripheral, name: name as NSString, address: address as NSString, type: 1, central: centralManager!)
         devices.updateValue(device, forKey: address)
         
-        var dev = Dictionary<String, Any?>()
-
-        dev.updateValue(name as NSString, forKey: "name")
-        dev.updateValue(address as NSString, forKey: "address")
-        dev.updateValue(1 as NSNumber, forKey: "type")
-
+        let dev: Dictionary<String, Any> = [
+            "name" : name as NSString,
+            "address": address as NSString,
+            "type": 1 as NSNumber
+        ]
         channel.invokeMethod("didDiscover", arguments: dev)
     }
     
@@ -122,23 +123,19 @@ public class BluetoothPeripheral: NSObject, CBPeripheralDelegate {
     var name: NSString
     var address: NSString
     var type: NSInteger
-    var services: [CBUUID]
     var central: CBCentralManager
     
-    var data: String = ""
+    var data: [[UInt8]] = []
     
-    
-    init(device: CBPeripheral, name:NSString , address : NSString, type: NSInteger, services: [CBUUID], central: CBCentralManager) {
+    init(device: CBPeripheral, name:NSString , address : NSString, type: NSInteger, central: CBCentralManager) {
         self.dev = device
         self.name = name;
         self.address = address;
         self.type = type;
-        self.services = services;
         self.central = central;
         
         super.init()
         dev.delegate = self
-        
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -153,43 +150,34 @@ public class BluetoothPeripheral: NSObject, CBPeripheralDelegate {
         }
     }
     
+    
+    var index: Int = 0
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         let writablecharacteristic = service.characteristics?.filter { $0.uuid.uuidString == writablecharacteristicUUID }.first
         
-        let data = Data(base64Encoded: self.data, options: .ignoreUnknownCharacters)!
-        let count = data.count
-        if (count < 20){
-            peripheral.writeValue(data, for: writablecharacteristic!, type: CBCharacteristicWriteType.withoutResponse)
-            return
-        }
-        
-        let dataLen = data.count
-        let chunkSize = dev.maximumWriteValueLength(for: CBCharacteristicWriteType.withoutResponse)
-        
-        let fullChunks = Int(dataLen / chunkSize)
-        let totalChunks = fullChunks + (dataLen % chunkSize != 0 ? 1 : 0)
-
-        for chunkCounter in 0..<totalChunks {
-          var chunk:Data
-          let chunkBase = chunkCounter * chunkSize
-          var diff = chunkSize
-          if(chunkCounter == totalChunks - 1) {
-            diff = dataLen - chunkBase
-          }
-
-          let range:Range<Data.Index> = chunkBase..<(chunkBase + diff)
-          chunk = data.subdata(in: range)
-            peripheral.writeValue(chunk, for: writablecharacteristic!, type: CBCharacteristicWriteType.withoutResponse)
-        }
+        index = 0
+        printByIndex(peripheral: peripheral, characteristic: writablecharacteristic!)
+    }
+    
+    private func printByIndex(peripheral: CBPeripheral, characteristic: CBCharacteristic){
+        let line = self.data[index]
+        let data = Data(bytes: line, count: line.count)
+        peripheral.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
-        //central.cancelPeripheralConnection(peripheral)
+        if (error == nil && index < data.count){
+            index += 1
+            printByIndex(peripheral: peripheral, characteristic: characteristic)
+            return
+        }
+        
+        central.cancelPeripheralConnection(peripheral)
     }
     
-    
-    public func print(data: String){
+    public func print(data: [[UInt8]]){
         self.data = data
+        
         let serviceUUIDs = BluetoothPeripheral.specifiedServices.map { CBUUID(string: $0) }
         dev.discoverServices(serviceUUIDs)
     }

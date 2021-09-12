@@ -45,7 +45,15 @@ class PrinterUtils {
   }
 
   List<int> decodeImage(Image image) {
-    final List<int> printOutput = [];
+    final chunks = decodeImageInChunks(image);
+    return chunks.fold(
+      <int>[],
+      (previousValue, element) => previousValue..addAll(element),
+    );
+  }
+
+  List<List<int>> decodeImageInChunks(Image image) {
+    final List<List<int>> printOutput = [];
     List<bool> imageBits = _getBitsImageData(image);
 
     int widthLSB = (image.width & 0xFF);
@@ -59,12 +67,11 @@ class PrinterUtils {
     List<int> setLineSpacing30Dots =
         _buildPOSCommand(setLineSpacing, <int>[30]);
 
-    printOutput.addAll(initializePrinter);
-    printOutput.addAll(setLineSpacing24Dots);
-
+    printOutput.add([...initializePrinter, ...setLineSpacing24Dots]);
     int offset = 0;
     while (offset < image.height) {
-      printOutput.addAll(selectBitImageModeCommand);
+      List<int> data = [...selectBitImageModeCommand];
+      //printOutput.add(selectBitImageModeCommand);
 
       int imageDataLineIndex = 0;
       List<int> imageDataLine =
@@ -107,20 +114,19 @@ class PrinterUtils {
           }
 
           imageDataLine[imageDataLineIndex + k] = slice;
-
-          // Phew! Write the damn byte to the buffer
-          //printOutput.write(slice);
         }
 
         imageDataLineIndex += 3;
       }
 
-      printOutput.addAll(imageDataLine);
+      data.addAll(imageDataLine);
+      printOutput.add(data);
+
       offset += 24;
-      printOutput.addAll(printAndFeedPaper);
+      printOutput.add(printAndFeedPaper);
     }
 
-    printOutput.addAll(setLineSpacing30Dots);
+    printOutput.add(setLineSpacing30Dots);
     return printOutput;
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
@@ -65,24 +64,27 @@ class BluetoothPrinter {
     _devices.clear();
   }
 
-  Future<void> printImage({
+  Future<void> printCommands({
     required BluetoothDevice device,
-    required img.Image image,
-  }) async {
-    final data = _utility.decodeImage(image);
-    await printBytes(device: device, bytes: Uint8List.fromList(data));
-  }
-
-  Future<void> printBytes({
-    required BluetoothDevice device,
-    required Uint8List bytes,
+    required List<Uint8List> commands,
   }) async {
     await _channel.invokeMethod(
       'print',
       {
         'address': device.address,
-        'data': base64.encode(bytes),
+        'data': commands,
       },
+    );
+  }
+
+  Future<void> printImage({
+    required BluetoothDevice device,
+    required img.Image image,
+  }) async {
+    final data = _utility.decodeImageInChunks(image);
+    await printCommands(
+      device: device,
+      commands: data.map((e) => Uint8List.fromList(e)).toList(),
     );
   }
 }
