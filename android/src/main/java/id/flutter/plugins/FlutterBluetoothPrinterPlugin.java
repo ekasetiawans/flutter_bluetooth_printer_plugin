@@ -135,7 +135,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                             final HashMap<String, Object> map = new HashMap<>();
                             map.put("total", bytes.length);
                             map.put("progress", bytes.length);
-                            channel.invokeMethod("onPrintingResult", map);
+                            channel.invokeMethod("onPrintingProgress", map);
                         });
                     } catch (Exception e) {
                         new Handler(Looper.getMainLooper()).post(()->{
