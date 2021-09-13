@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import CoreBluetooth
+import "ConnecterManager.h"
 
 @available(iOS 10.0, *)
 public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, CBCentralManagerDelegate {
