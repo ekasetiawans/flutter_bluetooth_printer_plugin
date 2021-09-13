@@ -1,3 +1,6 @@
+## 1.1.0
+
+* 2021-09-13: Add support for iOS.
 ## 1.0.3
 
 * 2021-09-13: Update description.
