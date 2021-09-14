@@ -107,6 +107,10 @@
                     result(@(YES));
                     break;
                     
+                case CONNECT_STATE_DISCONNECT:
+                    weakSelf.connectedDevice = nil;
+                    break;
+                    
                 case CONNECT_STATE_FAILT:
                 case CONNECT_STATE_TIMEOUT:
                     result(@(NO));
@@ -125,9 +129,12 @@
       }
   } else if ([@"disconnect" isEqualToString:call.method]){
       @try {
-        _connectedDevice = nil;
-        [Manager close];
-        result(nil);
+        if (_connectedDevice != nil){
+            [[Manager bleConnecter] closePeripheral:_connectedDevice];
+            _connectedDevice = nil;
+        }
+        
+        result(@(YES));
       } @catch(FlutterError *e) {
         result(e);
       }

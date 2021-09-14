@@ -1,3 +1,6 @@
+## 1.1.2
+
+* 2021-09-14: fix freeze on android
 ## 1.1.1
 
 * 2021-09-14: added isConnected and getConnectedDevice

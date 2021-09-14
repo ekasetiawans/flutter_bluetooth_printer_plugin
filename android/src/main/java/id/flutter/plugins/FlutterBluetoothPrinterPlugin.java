@@ -69,13 +69,13 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         }
     };
 
-    private Map<String, Object> deviceToMap(BluetoothDevice device){
+    private Map<String, Object> deviceToMap(BluetoothDevice device) {
         final HashMap<String, Object> map = new HashMap<>();
         map.put("name", device.getName());
         map.put("address", device.getAddress());
         map.put("type", device.getType());
 
-        if (connectedDevice == null){
+        if (connectedDevice == null) {
             map.put("is_connected", false);
         } else {
             map.put("is_connected", device.getAddress().equals(connectedDevice.getAddress()));
@@ -92,7 +92,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 break;
 
             case "startScan":
-                if (!bluetoothAdapter.isDiscovering()){
+                if (!bluetoothAdapter.isDiscovering()) {
                     discoveredDevices.clear();
                     bluetoothAdapter.startDiscovery();
                 }
@@ -100,7 +100,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 break;
 
             case "stopScan":
-                if (bluetoothAdapter.isDiscovering()){
+                if (bluetoothAdapter.isDiscovering()) {
                     bluetoothAdapter.cancelDiscovery();
                 }
                 result.success(true);
@@ -111,7 +111,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 break;
 
             case "connectedDevice":
-                if (connectedDevice != null){
+                if (connectedDevice != null) {
                     result.success(deviceToMap(connectedDevice));
                     return;
                 }
@@ -120,43 +120,55 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 break;
 
             case "connect":
-                try {
-                    String address = call.argument("address");
-                    final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-                    UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-                    bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
-                    bluetoothSocket.connect();
+                AsyncTask.execute(() -> {
+                    try {
+                        String address = call.argument("address");
+                        final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
+                        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+                        bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
+                        bluetoothSocket.connect();
+                        connectedDevice = device;
+                        writeStream = bluetoothSocket.getOutputStream();
 
-                    connectedDevice = device;
-                    writeStream = bluetoothSocket.getOutputStream();
-                    final HashMap<String, Object> map = new HashMap<>();
-                    map.put("id", 1);
-                    channel.invokeMethod("onStateChanged", map);
-                    result.success(true);
-                }catch (Exception e){
-                    result.error("error", e.getMessage(), null);
-                }
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            final HashMap<String, Object> map = new HashMap<>();
+                            map.put("id", 1);
+                            channel.invokeMethod("onStateChanged", map);
+                            result.success(true);
+                        });
+                    } catch (Exception e) {
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            result.error("error", e.getMessage(), null);
+                        });
+                    }
+                });
+
                 break;
 
             case "disconnect":
-                try {
-                    writeStream.close();
-                    bluetoothSocket.close();
+                AsyncTask.execute(() -> {
+                    try {
+                        writeStream.close();
+                        bluetoothSocket.close();
 
-                    connectedDevice = null;
-                    final HashMap<String, Object> map = new HashMap<>();
-                    map.put("id", 3);
-                    channel.invokeMethod("onStateChanged", map);
-                    result.success(true);
+                        connectedDevice = null;
 
-
-                } catch (Exception e) {
-                    result.error("error", e.getMessage(), null);
-                }
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            final HashMap<String, Object> map = new HashMap<>();
+                            map.put("id", 3);
+                            channel.invokeMethod("onStateChanged", map);
+                            result.success(true);
+                        });
+                    } catch (Exception e) {
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            result.error("error", e.getMessage(), null);
+                        });
+                    }
+                });
                 break;
 
             case "print": {
-                if (connectedDevice == null){
+                if (connectedDevice == null) {
                     result.error("error", "No connected devices", null);
                     return;
                 }
@@ -167,7 +179,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                         writeStream.write(bytes);
                         writeStream.flush();
 
-                        new Handler(Looper.getMainLooper()).post(()->{
+                        new Handler(Looper.getMainLooper()).post(() -> {
                             result.success(true);
 
                             final HashMap<String, Object> map = new HashMap<>();
@@ -176,7 +188,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                             channel.invokeMethod("onPrintingProgress", map);
                         });
                     } catch (Exception e) {
-                        new Handler(Looper.getMainLooper()).post(()->{
+                        new Handler(Looper.getMainLooper()).post(() -> {
                             result.error("error", e.getMessage(), null);
                         });
                         e.printStackTrace();
@@ -191,7 +203,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         }
     }
 
-    private void isEnabled(MethodChannel.Result result){
+    private void isEnabled(MethodChannel.Result result) {
         if (!isPermitted(result)) {
             return;
         }
@@ -206,7 +218,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         }
 
         final int res = activity.checkSelfPermission("android.permission.BLUETOOTH");
-        if (res != PackageManager.PERMISSION_GRANTED){
+        if (res != PackageManager.PERMISSION_GRANTED) {
             result.error("permission_denied", "Permission denied", null);
             return false;
         }
