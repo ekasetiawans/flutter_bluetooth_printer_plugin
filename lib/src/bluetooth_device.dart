@@ -4,17 +4,14 @@ class BluetoothDevice {
   final String name;
   final String address;
   final int type;
+  final bool isConnected;
 
   const BluetoothDevice({
     required this.name,
     required this.address,
     required this.type,
+    required this.isConnected,
   });
-
-  bool get isConnected {
-    final connectedDevices = BluetoothPrinter.instance.connectedDevice;
-    return connectedDevices?.address == address;
-  }
 
   Future<bool> connect() async {
     return BluetoothPrinter.instance.connect(this);

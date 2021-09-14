@@ -43,6 +43,9 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     private BluetoothSocket bluetoothSocket;
     private OutputStream writeStream;
 
+    private BluetoothDevice connectedDevice;
+    private Map<String, BluetoothDevice> discoveredDevices = new HashMap<>();
+
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "id.flutter.plugins/bluetooth_printer");
@@ -59,14 +62,26 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                final HashMap<String, Object> map = new HashMap<>();
-                map.put("name", device.getName());
-                map.put("address", device.getAddress());
-                map.put("type", device.getType());
+                final Map<String, Object> map = deviceToMap(device);
                 channel.invokeMethod("onDiscovered", map);
+                discoveredDevices.put(device.getAddress(), device);
             }
         }
     };
+
+    private Map<String, Object> deviceToMap(BluetoothDevice device){
+        final HashMap<String, Object> map = new HashMap<>();
+        map.put("name", device.getName());
+        map.put("address", device.getAddress());
+        map.put("type", device.getType());
+
+        if (connectedDevice == null){
+            map.put("is_connected", false);
+        } else {
+            map.put("is_connected", device.getAddress().equals(connectedDevice.getAddress()));
+        }
+        return map;
+    }
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
@@ -78,6 +93,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
             case "startScan":
                 if (!bluetoothAdapter.isDiscovering()){
+                    discoveredDevices.clear();
                     bluetoothAdapter.startDiscovery();
                 }
                 result.success(true);
@@ -90,6 +106,19 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 result.success(true);
                 break;
 
+            case "isConnected":
+                result.success(connectedDevice != null);
+                break;
+
+            case "connectedDevice":
+                if (connectedDevice != null){
+                    result.success(deviceToMap(connectedDevice));
+                    return;
+                }
+
+                result.success(null);
+                break;
+
             case "connect":
                 try {
                     String address = call.argument("address");
@@ -97,8 +126,9 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                     UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
                     bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
                     bluetoothSocket.connect();
-                    writeStream = bluetoothSocket.getOutputStream();
 
+                    connectedDevice = device;
+                    writeStream = bluetoothSocket.getOutputStream();
                     final HashMap<String, Object> map = new HashMap<>();
                     map.put("id", 1);
                     channel.invokeMethod("onStateChanged", map);
@@ -112,20 +142,28 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 try {
                     writeStream.close();
                     bluetoothSocket.close();
+
+                    connectedDevice = null;
                     final HashMap<String, Object> map = new HashMap<>();
                     map.put("id", 3);
                     channel.invokeMethod("onStateChanged", map);
                     result.success(true);
+
+
                 } catch (Exception e) {
                     result.error("error", e.getMessage(), null);
                 }
                 break;
 
             case "print": {
-                final String str = call.argument("bytes");
+                if (connectedDevice == null){
+                    result.error("error", "No connected devices", null);
+                    return;
+                }
+
+                final byte[] bytes = (byte[]) call.arguments;
                 AsyncTask.execute(() -> {
                     try {
-                        byte[] bytes = Base64.decode(str, Base64.DEFAULT);
                         writeStream.write(bytes);
                         writeStream.flush();
 

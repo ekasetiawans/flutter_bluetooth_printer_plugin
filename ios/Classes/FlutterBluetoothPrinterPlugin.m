@@ -5,6 +5,8 @@
 @property(nonatomic, retain) NSObject<FlutterPluginRegistrar> *registrar;
 @property(nonatomic, retain) FlutterMethodChannel *channel;
 @property(nonatomic) NSMutableDictionary *scannedPeripherals;
+@property(nonatomic) CBPeripheral *connectedDevice;
+@property(nonatomic) bool isAvailable;
 @end
 
 @implementation FlutterBluetoothPrinterPlugin
@@ -21,48 +23,68 @@
   [registrar addMethodCallDelegate:instance channel:channel];
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.isAvailable = false;
+        [Manager didUpdateState:^(NSInteger state) {
+            switch (state) {
+                case CBManagerStateUnsupported:
+                    NSLog(@"The platform/hardware doesn't support Bluetooth Low Energy.");
+                    break;
+                case CBManagerStateUnauthorized:
+                    NSLog(@"The app is not authorized to use Bluetooth Low Energy.");
+                    break;
+                case CBManagerStatePoweredOff:
+                    NSLog(@"Bluetooth is currently powered off.");
+                    break;
+                case CBManagerStatePoweredOn:
+                    self->_isAvailable = true;
+                    NSLog(@"Bluetooth power on");
+                    break;
+                case CBManagerStateUnknown:
+                default:
+                    break;
+            }
+        }];
+    }
+    return self;
+}
+
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
   if ([@"startScan" isEqualToString:call.method]) {
       [self.scannedPeripherals removeAllObjects];
       
-        if (Manager.bleConnecter == nil) {
-            [Manager didUpdateState:^(NSInteger state) {
-                switch (state) {
-                    case CBManagerStateUnsupported:
-                        NSLog(@"The platform/hardware doesn't support Bluetooth Low Energy.");
-                        break;
-                    case CBManagerStateUnauthorized:
-                        NSLog(@"The app is not authorized to use Bluetooth Low Energy.");
-                        break;
-                    case CBManagerStatePoweredOff:
-                        NSLog(@"Bluetooth is currently powered off.");
-                        break;
-                    case CBManagerStatePoweredOn:
-                        [self startScan];
-                        NSLog(@"Bluetooth power on");
-                        break;
-                    case CBManagerStateUnknown:
-                    default:
-                        break;
-                }
-            }];
-        } else {
-            [self startScan];
-        }
+      if (_isAvailable){
+          [self startScan];
+          result(@(YES));
+          return;
+      }
       
-      result(@(YES));
+      result(@(NO));
+  } else if ([@"isConnected" isEqualToString:call.method]){
+      bool res = [self connectedDevice] != nil;
+      result(@(res));
+  } else if ([@"connectedDevice" isEqualToString:call.method]){
+      if (_connectedDevice != nil){
+          NSDictionary *map = [self deviceToMap:_connectedDevice];
+          result(map);
+          return;
+      }
+      
+      result(nil);
   } else if ([@"stopScan" isEqualToString:call.method]){
       [Manager stopScan];
       result(@(YES));
   } else if ([@"isEnabled" isEqualToString:call.method]){
-      result(@(YES));
+      result(@(_isAvailable));
   } else if ([@"print" isEqualToString:call.method]){
       @try {
-         NSDictionary *args = [call arguments];
-         NSString *str = [args objectForKey:@"bytes"];
-
-         NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:str options:0];
-          [Manager write:decodedData progress:^(NSUInteger total, NSUInteger progress) {
+          FlutterStandardTypedData *arg = [call arguments];
+          NSData *data = [arg data];
+          
+          [Manager write:data progress:^(NSUInteger total, NSUInteger progress) {
               NSDictionary *res = @{@"total": @(total), @"progress": @(progress)};
               [self->_channel invokeMethod:@"onPrintingProgress" arguments:res];
           } receCallBack:^(NSData * _Nullable data) {
@@ -81,6 +103,7 @@
         self.state = ^(ConnectState state) {
             switch (state) {
                 case CONNECT_STATE_CONNECTED:
+                    weakSelf.connectedDevice = peripheral;
                     result(@(YES));
                     break;
                     
@@ -102,6 +125,7 @@
       }
   } else if ([@"disconnect" isEqualToString:call.method]){
       @try {
+        _connectedDevice = nil;
         [Manager close];
         result(nil);
       } @catch(FlutterError *e) {
@@ -117,10 +141,20 @@
         if (peripheral.name != nil) {
             [self.scannedPeripherals setObject:peripheral forKey:[[peripheral identifier] UUIDString]];
             
-            NSDictionary *device = [NSDictionary dictionaryWithObjectsAndKeys:peripheral.identifier.UUIDString,@"address",peripheral.name,@"name",@1,@"type",nil];
+            NSDictionary *device = [self deviceToMap:peripheral];
             [self->_channel invokeMethod:@"onDiscovered" arguments:device];
         }
     }];
+}
+
+- (NSDictionary*) deviceToMap:(CBPeripheral*)peripheral {
+    bool isConnected = false;
+    if (_connectedDevice != nil){
+        isConnected = _connectedDevice.identifier.UUIDString == peripheral.identifier.UUIDString;
+    }
+    
+    NSDictionary *device = [NSDictionary dictionaryWithObjectsAndKeys:peripheral.identifier.UUIDString,@"address",peripheral.name,@"name",@1,@"type", @(isConnected), @"is_connected",nil];
+    return device;
 }
 
 -(void)updateConnectState:(ConnectState)state {

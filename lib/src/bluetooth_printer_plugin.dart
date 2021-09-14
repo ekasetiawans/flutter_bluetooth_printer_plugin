@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:flutter_bluetooth_printer/src/bluetooth_device.dart';
 import 'package:image/image.dart' as img;
 import 'package:native_pdf_renderer/native_pdf_renderer.dart' as rd;
@@ -32,6 +32,7 @@ class BluetoothPrinter {
             name: dev['name'],
             address: dev['address'],
             type: dev['type'],
+            isConnected: dev['is_connected'],
           );
 
           if (!_devices.any((element) => element.address == device.address)) {
@@ -58,12 +59,6 @@ class BluetoothPrinter {
 
       return true;
     });
-
-    stateChanged.listen((event) {
-      if (event == 3) {
-        _connectedDevice = null;
-      }
-    });
   }
 
   Future<bool> isEnabled() async {
@@ -76,8 +71,24 @@ class BluetoothPrinter {
     await _channel.invokeMethod('startScan');
   }
 
-  BluetoothDevice? _connectedDevice;
-  BluetoothDevice? get connectedDevice => _connectedDevice;
+  Future<BluetoothDevice?> getConnectedDevice() async {
+    final res = await _channel.invokeMethod('connectedDevice');
+    if (res != null) {
+      final device = BluetoothDevice(
+        name: res['name'],
+        address: res['address'],
+        type: res['type'],
+        isConnected: res['is_connected'],
+      );
+      return device;
+    }
+
+    return null;
+  }
+
+  Future<bool> isConnected() async {
+    return await _channel.invokeMethod('isConnected');
+  }
 
   Future<bool> connect(BluetoothDevice device) async {
     final completer = Completer<bool>();
@@ -99,9 +110,6 @@ class BluetoothPrinter {
       });
 
       final res = await completer.future;
-      if (res) {
-        _connectedDevice = device;
-      }
       return res;
     } catch (e) {
       return false;
@@ -141,10 +149,7 @@ class BluetoothPrinter {
 
     await _channel.invokeMethod(
       'print',
-      {
-        'bytes': base64.encode(bytes),
-        'length': bytes.length,
-      },
+      bytes,
     );
 
     await completer.future;
@@ -169,22 +174,48 @@ class BluetoothPrinter {
     required Uint8List data,
     int pageNumber = 1,
     PaperSize paperSize = PaperSize.mm58,
+    int printerDpi = 203,
     void Function(int total, int progress)? progress,
   }) async {
-    final doc = await rd.PdfDocument.openData(data);
-    final page = await doc.getPage(pageNumber);
+    double mm = 25.4;
+    double paperWidthInInch = paperSize == PaperSize.mm58 ? 47 / mm : 70 / mm;
 
-    final pageImage = await page.render(
-      width: page.width * 2,
-      height: page.height * 2,
-      format: rd.PdfPageFormat.JPEG,
+    final bytes = await _rasterPdf(
+      data: data,
+      pageNumber: pageNumber,
+      paperWidthInInch: paperWidthInInch,
+      printerDpi: printerDpi,
     );
 
-    final image = img.decodeJpg(pageImage!.bytes);
+    final image = img.decodeJpg(bytes);
     return printImage(
       image: image,
       paperSize: paperSize,
       progress: progress,
     );
   }
+}
+
+Future<List<int>> _rasterPdf({
+  required Uint8List data,
+  required int pageNumber,
+  required int printerDpi,
+  required double paperWidthInInch,
+}) async {
+  final doc = await rd.PdfDocument.openData(Uint8List.fromList(data));
+  final page = await doc.getPage(pageNumber);
+
+  double dotsPerLine = paperWidthInInch * printerDpi;
+
+  double ratio = dotsPerLine / page.width;
+  int width = (page.width * ratio).floor();
+  int height = (page.height * ratio).floor();
+
+  final pageImage = await page.render(
+    width: width,
+    height: height,
+    format: rd.PdfPageFormat.JPEG,
+  );
+
+  return pageImage!.bytes;
 }
