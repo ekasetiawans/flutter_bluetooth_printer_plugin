@@ -1,3 +1,6 @@
+## 1.1.1
+
+* 2021-09-14: added isConnected and getConnectedDevice
 ## 1.1.0+1
 
 * 2021-09-13: Fix method name in android.
