@@ -1,3 +1,6 @@
+## 1.1.4
+
+* 2021-09-25: remove dotsPerLine
 ## 1.1.3
 
 * 2021-09-25: improve printing

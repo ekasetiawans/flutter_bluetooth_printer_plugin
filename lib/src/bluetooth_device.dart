@@ -58,12 +58,13 @@ class BluetoothDevice {
   Future<void> printImage({
     required img.Image image,
     PaperSize paperSize = PaperSize.mm58,
-    int? dotsPerLine,
     void Function(int total, int progress)? progress,
   }) async {
     img.Image src;
-    dotsPerLine ??= paperSize == PaperSize.mm58 ? 384 : 576;
 
+    final dotsPerLine = paperSize.width;
+
+    // make sure image not bigger than printable area
     if (image.width > dotsPerLine) {
       double ratio = dotsPerLine / image.width;
       int height = (image.height * ratio).ceil();
@@ -90,15 +91,12 @@ class BluetoothDevice {
     required Uint8List data,
     int pageNumber = 1,
     PaperSize paperSize = PaperSize.mm58,
-    int? dotsPerLine,
     void Function(int total, int progress)? progress,
   }) async {
-    dotsPerLine ??= (paperSize == PaperSize.mm58 ? 384 : 576);
-
     final bytes = await _rasterPdf(
       data: data,
       pageNumber: pageNumber,
-      dotsPerLine: dotsPerLine,
+      width: paperSize.width,
     );
 
     final image = img.decodeJpg(bytes);
@@ -106,20 +104,18 @@ class BluetoothDevice {
       image: image,
       paperSize: paperSize,
       progress: progress,
-      dotsPerLine: dotsPerLine,
     );
   }
 
   Future<List<int>> _rasterPdf({
     required Uint8List data,
     required int pageNumber,
-    required int dotsPerLine,
+    required int width,
   }) async {
     final doc = await rd.PdfDocument.openData(Uint8List.fromList(data));
     final page = await doc.getPage(pageNumber);
 
-    double ratio = dotsPerLine / page.width;
-    int width = dotsPerLine;
+    double ratio = width / page.width;
     int height = (page.height * ratio).ceil();
 
     final pageImage = await page.render(
