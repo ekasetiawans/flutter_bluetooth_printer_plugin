@@ -1,3 +1,6 @@
+## 1.1.3
+
+* 2021-09-25: improve printing
 ## 1.1.2
 
 * 2021-09-14: fix freeze on android
