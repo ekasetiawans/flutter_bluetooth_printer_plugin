@@ -58,11 +58,27 @@ class BluetoothDevice {
   Future<void> printImage({
     required img.Image image,
     PaperSize paperSize = PaperSize.mm58,
+    int? dotsPerLine,
     void Function(int total, int progress)? progress,
   }) async {
+    img.Image src;
+    dotsPerLine ??= paperSize == PaperSize.mm58 ? 384 : 576;
+
+    if (image.width > dotsPerLine) {
+      double ratio = dotsPerLine / image.width;
+      int height = (image.height * ratio).ceil();
+      src = img.copyResize(
+        image,
+        width: dotsPerLine,
+        height: height,
+      );
+    } else {
+      src = image;
+    }
+
     final profile = await CapabilityProfile.load();
     final generator = Generator(paperSize, profile);
-    final data = generator.image(image);
+    final data = generator.image(src);
 
     await printBytes(
       bytes: Uint8List.fromList(data),
@@ -74,17 +90,15 @@ class BluetoothDevice {
     required Uint8List data,
     int pageNumber = 1,
     PaperSize paperSize = PaperSize.mm58,
-    int printerDpi = 203,
+    int? dotsPerLine,
     void Function(int total, int progress)? progress,
   }) async {
-    double mm = 25.4;
-    double paperWidthInInch = paperSize == PaperSize.mm58 ? 47 / mm : 70 / mm;
+    dotsPerLine ??= (paperSize == PaperSize.mm58 ? 384 : 576);
 
     final bytes = await _rasterPdf(
       data: data,
       pageNumber: pageNumber,
-      paperWidthInInch: paperWidthInInch,
-      printerDpi: printerDpi,
+      dotsPerLine: dotsPerLine,
     );
 
     final image = img.decodeJpg(bytes);
@@ -92,23 +106,21 @@ class BluetoothDevice {
       image: image,
       paperSize: paperSize,
       progress: progress,
+      dotsPerLine: dotsPerLine,
     );
   }
 
   Future<List<int>> _rasterPdf({
     required Uint8List data,
     required int pageNumber,
-    required int printerDpi,
-    required double paperWidthInInch,
+    required int dotsPerLine,
   }) async {
     final doc = await rd.PdfDocument.openData(Uint8List.fromList(data));
     final page = await doc.getPage(pageNumber);
 
-    double dotsPerLine = paperWidthInInch * printerDpi;
-
     double ratio = dotsPerLine / page.width;
-    int width = (page.width * ratio).floor();
-    int height = (page.height * ratio).floor();
+    int width = dotsPerLine;
+    int height = (page.height * ratio).ceil();
 
     final pageImage = await page.render(
       width: width,
