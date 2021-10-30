@@ -22,10 +22,10 @@ typedef enum : NSUInteger{
 #define Manager [ConnecterManager sharedInstance]
 
 @interface ConnecterManager : NSObject
-@property(nonatomic,strong)BLEConnecter *bleConnecter;
-@property(nonatomic,strong)Connecter *connecter;
+@property(nonatomic,strong)BLEConnecter * _Nullable bleConnecter;
+@property(nonatomic,strong)Connecter * _Nullable connecter;
 
-+(instancetype)sharedInstance;
++(instancetype _Nullable )sharedInstance;
 
 /**
  *  方法说明：关闭连接
@@ -44,13 +44,13 @@ typedef enum : NSUInteger{
  *  方法说明：向输出流中写入数据 // Method description: writing data to the output stream
  *  @param callBack 读取数据接口
  */
--(void)write:(NSData *)data receCallBack:(void (^)(NSData *))callBack;
+-(void)write:(NSData *_Nullable)data receCallBack:(void (^_Nullable)(NSData *_Nullable))callBack;
 
 /**
  *  方法说明：向输出流中写入数据 // Method description: writing data to the output stream
  *  @param data 需要写入的数据
  */
--(void)write:(NSData *)data;
+-(void)write:(NSData *_Nullable)data;
 
 /**
  *  方法说明：停止扫描
@@ -61,7 +61,7 @@ typedef enum : NSUInteger{
  *  方法说明：更新蓝牙状态
  *  @param state 蓝牙状态
  */
--(void)didUpdateState:(void(^)(NSInteger state))state;
+-(void)didUpdateState:(void(^_Nullable)(NSInteger state))state;
 
 /**
  *  方法说明：连接外设
@@ -70,7 +70,7 @@ typedef enum : NSUInteger{
  *  @param timeout 连接时间
  *  @param connectState 连接状态
  */
--(void)connectPeripheral:(CBPeripheral *)peripheral options:(nullable NSDictionary<NSString *,id> *)options timeout:(NSUInteger)timeout connectBlack:(void(^_Nullable)(ConnectState state)) connectState;
+-(void)connectPeripheral:(CBPeripheral *_Nullable)peripheral options:(nullable NSDictionary<NSString *,id> *)options timeout:(NSUInteger)timeout connectBlack:(void(^_Nullable)(ConnectState state)) connectState;
 
 /**
  *  方法说明：连接外设

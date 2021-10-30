@@ -102,6 +102,10 @@ static dispatch_once_t once;
         case BLUETOOTH:
             _bleConnecter = nil;
             break;
+            
+        case ETHERNET:
+            
+            break;
     }
 }
 

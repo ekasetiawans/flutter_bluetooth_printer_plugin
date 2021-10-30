@@ -166,7 +166,8 @@
 
 -(void)updateConnectState:(ConnectState)state {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSNumber *ret = @0;
+        NSNumber *ret;
+        
         switch (state) {
             case CONNECT_STATE_CONNECTING:
                 NSLog(@"status -> %@", @"Connecting ...");

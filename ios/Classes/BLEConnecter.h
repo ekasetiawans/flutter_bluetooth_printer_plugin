@@ -8,26 +8,26 @@
 
 @interface BLEConnecter :Connecter
 
-@property(nonatomic,strong)CBCharacteristic *airPatchChar;
-@property(nonatomic,strong)CBCharacteristic *transparentDataWriteChar;
-@property(nonatomic,strong)CBCharacteristic *transparentDataReadOrNotifyChar;
-@property(nonatomic,strong)CBCharacteristic *connectionParameterChar;
+@property(nonatomic,strong)CBCharacteristic * _Nullable airPatchChar;
+@property(nonatomic,strong)CBCharacteristic * _Nullable transparentDataWriteChar;
+@property(nonatomic,strong)CBCharacteristic * _Nullable transparentDataReadOrNotifyChar;
+@property(nonatomic,strong)CBCharacteristic * _Nullable connectionParameterChar;
 
-@property(nonatomic,strong)CBUUID *transServiceUUID;
-@property(nonatomic,strong)CBUUID *transTxUUID;
-@property(nonatomic,strong)CBUUID *transRxUUID;
-@property(nonatomic,strong)CBUUID *disUUID1;
-@property(nonatomic,strong)CBUUID *disUUID2;
-@property(nonatomic,strong)NSArray *serviceUUID;
+@property(nonatomic,strong)CBUUID * _Nullable transServiceUUID;
+@property(nonatomic,strong)CBUUID * _Nullable transTxUUID;
+@property(nonatomic,strong)CBUUID * _Nullable transRxUUID;
+@property(nonatomic,strong)CBUUID * _Nullable disUUID1;
+@property(nonatomic,strong)CBUUID * _Nullable disUUID2;
+@property(nonatomic,strong)NSArray * _Nullable serviceUUID;
 
-@property(nonatomic,copy)DiscoverDevice discover;
-@property(nonatomic,copy)UpdateState updateState;
-@property(nonatomic,copy)WriteProgress writeProgress;
+@property(nonatomic,copy)DiscoverDevice _Nullable discover;
+@property(nonatomic,copy)UpdateState _Nullable updateState;
+@property(nonatomic,copy)WriteProgress _Nullable writeProgress;
 
 /**数据包大小，默认130个字节*/
 @property(nonatomic,assign)NSUInteger datagramSize;
 
-@property(nonatomic,strong)CBPeripheral *connPeripheral;
+@property(nonatomic,strong)CBPeripheral * _Nullable connPeripheral;
 
 //+(instancetype)sharedInstance;
 
@@ -37,7 +37,7 @@
  *  @param txUUID   具有写入权限特征值
  *  @param rxUUID   具有读取权限特征值
  */
-- (void)configureTransparentServiceUUID: (NSString *)serviceUUID txUUID:(NSString *)txUUID rxUUID:(NSString *)rxUUID;
+- (void)configureTransparentServiceUUID: (NSString *_Nullable)serviceUUID txUUID:(NSString *_Nullable)txUUID rxUUID:(NSString *_Nullable)rxUUID;
 
 /**
  *  方法说明：扫描外设
@@ -98,5 +98,5 @@
  *  @param type  写入方式<b>CBCharacteristicWriteWithResponse</b>写入方式是带流控写入方式。<b>CBCharacteristicWriteWithoutResponse</b>不带流控写入方式 <p><b>@see CBCharacteristicWriteType</b></p>
  * Writing method <b>CBCharacteristicWriteWithResponse</b> The writing method is a writing method with flow control. <b>CBCharacteristicWriteWithoutResponse</b>Without flow control write method <p><b>@see CBCharacteristicWriteType</b></p>
  */
--(void)writeValue:(NSData *)data forCharacteristic:(nonnull CBCharacteristic *)characteristic type:(CBCharacteristicWriteType)type;
+-(void)writeValue:(NSData *_Nullable)data forCharacteristic:(nonnull CBCharacteristic *)characteristic type:(CBCharacteristicWriteType)type;
 @end

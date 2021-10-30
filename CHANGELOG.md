@@ -1,3 +1,6 @@
+## 1.1.5
+
+* 2021-10-30: refactor objc code
 ## 1.1.4
 
 * 2021-09-25: remove dotsPerLine
