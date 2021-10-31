@@ -95,6 +95,13 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 if (!bluetoothAdapter.isDiscovering()) {
                     discoveredDevices.clear();
                     bluetoothAdapter.startDiscovery();
+
+                    Set<BluetoothDevice> bonded = bluetoothAdapter.getBondedDevices();
+                    for (BluetoothDevice device : bonded) {
+                        final Map<String, Object> map = deviceToMap(device);
+                        channel.invokeMethod("onDiscovered", map);
+                        discoveredDevices.put(device.getAddress(), device);
+                    }
                 }
                 result.success(true);
                 break;

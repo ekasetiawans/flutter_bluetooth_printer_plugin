@@ -1,3 +1,6 @@
+## 1.1.6
+
+* 2021-10-31: retrieve bonded devices on android
 ## 1.1.5
 
 * 2021-10-30: refactor objc code
