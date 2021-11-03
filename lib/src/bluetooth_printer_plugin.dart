@@ -62,6 +62,27 @@ class BluetoothPrinter {
     await _channel.invokeMethod('startScan');
   }
 
+  Future<BluetoothDevice?> getDeviceByAddress({required String address}) async {
+    final idx = _devices.indexWhere((element) => element.address == address);
+    if (idx >= 0) {
+      return _devices[idx];
+    }
+
+    final dev = await _channel.invokeMethod('getDevice', {
+      'address': address,
+    });
+
+    if (dev != null) {
+      return BluetoothDevice._internal(
+        name: dev['name'],
+        address: dev['address'],
+        type: dev['type'],
+        isConnected: dev['is_connected'],
+        printer: this,
+      );
+    }
+  }
+
   Future<BluetoothDevice?> getConnectedDevice() async {
     final res = await _channel.invokeMethod('connectedDevice');
     if (res != null) {

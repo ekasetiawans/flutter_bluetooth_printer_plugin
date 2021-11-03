@@ -1,3 +1,6 @@
+## 1.1.7
+
+* 2021-11-03: added getDevice by address method
 ## 1.1.6
 
 * 2021-10-31: retrieve bonded devices on android

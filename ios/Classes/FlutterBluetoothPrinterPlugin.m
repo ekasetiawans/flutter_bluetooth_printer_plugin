@@ -96,7 +96,6 @@
   } else if ([@"connect" isEqualToString:call.method]){
       NSDictionary *device = [call arguments];
       @try {
-        NSLog(@"connect device begin -> %@", [device objectForKey:@"name"]);
         CBPeripheral *peripheral = [_scannedPeripherals objectForKey:[device objectForKey:@"address"]];
         
         __weak typeof(self) weakSelf = self;
@@ -126,6 +125,17 @@
         
       } @catch(FlutterError *e) {
         result(e);
+      }
+  } else if ([@"getDevice" isEqualToString:call.method]){
+      NSDictionary *device = [call arguments];
+      @try {
+        CBPeripheral *peripheral = [_scannedPeripherals objectForKey:[device objectForKey:@"address"]];
+        if (peripheral != nil){
+            NSDictionary *map = [self deviceToMap:peripheral];
+            result(map);
+        }
+      } @catch(FlutterError *e) {
+        result(nil);
       }
   } else if ([@"disconnect" isEqualToString:call.method]){
       @try {
