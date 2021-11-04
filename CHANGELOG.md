@@ -1,3 +1,6 @@
+## 1.1.8
+
+* 2021-11-04: fix java code
 ## 1.1.7
 
 * 2021-11-03: added getDevice by address method
