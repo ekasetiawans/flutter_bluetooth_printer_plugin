@@ -100,11 +100,15 @@ class BluetoothDevice {
     );
 
     final image = img.decodeJpg(bytes);
-    return printImage(
-      image: image,
-      paperSize: paperSize,
-      progress: progress,
-    );
+    if (image != null) {
+      return printImage(
+        image: image,
+        paperSize: paperSize,
+        progress: progress,
+      );
+    }
+
+    throw Exception('Invalid JPG Image');
   }
 
   Future<List<int>> _rasterPdf({
