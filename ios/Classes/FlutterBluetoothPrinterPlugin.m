@@ -7,6 +7,7 @@
 @property(nonatomic) NSMutableDictionary *scannedPeripherals;
 @property(nonatomic) CBPeripheral *connectedDevice;
 @property(nonatomic) bool isAvailable;
+@property(nonatomic) bool isInitialized;
 @end
 
 @implementation FlutterBluetoothPrinterPlugin
@@ -26,43 +27,54 @@
 - (instancetype)init
 {
     self = [super init];
-    if (self) {
-        self.isAvailable = false;
-        [Manager didUpdateState:^(NSInteger state) {
-            switch (state) {
-                case CBManagerStateUnsupported:
-                    NSLog(@"The platform/hardware doesn't support Bluetooth Low Energy.");
-                    break;
-                case CBManagerStateUnauthorized:
-                    NSLog(@"The app is not authorized to use Bluetooth Low Energy.");
-                    break;
-                case CBManagerStatePoweredOff:
-                    NSLog(@"Bluetooth is currently powered off.");
-                    break;
-                case CBManagerStatePoweredOn:
-                    self->_isAvailable = true;
-                    NSLog(@"Bluetooth power on");
-                    break;
-                case CBManagerStateUnknown:
-                default:
-                    break;
-            }
-        }];
-    }
     return self;
+}
+
+- (void) initialize:(void(^)(bool))callback {
+    if ([self isInitialized]){
+        callback(self.isAvailable);
+        return;
+    }
+    
+    self.isAvailable = false;
+    [Manager didUpdateState:^(NSInteger state) {
+        switch (state) {
+            case CBManagerStateUnsupported:
+                NSLog(@"The platform/hardware doesn't support Bluetooth Low Energy.");
+                callback(false);
+                break;
+            case CBManagerStateUnauthorized:
+                NSLog(@"The app is not authorized to use Bluetooth Low Energy.");
+                callback(false);
+                break;
+            case CBManagerStatePoweredOff:
+                NSLog(@"Bluetooth is currently powered off.");
+                callback(false);
+                break;
+            case CBManagerStatePoweredOn:
+                self->_isAvailable = true;
+                NSLog(@"Bluetooth power on");
+                callback(true);
+                break;
+            case CBManagerStateUnknown:
+            default:
+                callback(false);
+                break;
+        }
+    }];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
   if ([@"startScan" isEqualToString:call.method]) {
       [self.scannedPeripherals removeAllObjects];
-      
-      if (_isAvailable){
-          [self startScan];
-          result(@(YES));
-          return;
-      }
-      
-      result(@(NO));
+      [self initialize:^(bool isAvailable) {
+          if (isAvailable){
+              [self startScan];
+              result(@(YES));
+          } else {
+              result(@(NO));
+          }
+      }];
   } else if ([@"isConnected" isEqualToString:call.method]){
       bool res = [self connectedDevice] != nil;
       result(@(res));
@@ -78,7 +90,9 @@
       [Manager stopScan];
       result(@(YES));
   } else if ([@"isEnabled" isEqualToString:call.method]){
-      result(@(_isAvailable));
+      [self initialize:^(bool isAvailable) {
+          result(@(isAvailable));
+      }];
   } else if ([@"print" isEqualToString:call.method]){
       @try {
           FlutterStandardTypedData *arg = [call arguments];

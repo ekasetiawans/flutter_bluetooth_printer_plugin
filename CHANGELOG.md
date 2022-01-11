@@ -1,3 +1,6 @@
+## 1.1.10
+
+* 2022-01-11: check bluetooth permission [iOS] on start scan
 ## 1.1.9
 
 * 2021-12-09: fix Image?
