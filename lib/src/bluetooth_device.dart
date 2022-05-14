@@ -123,9 +123,9 @@ class BluetoothDevice {
     int height = (page.height * ratio).ceil();
 
     final pageImage = await page.render(
-      width: width,
-      height: height,
-      format: rd.PdfPageFormat.JPEG,
+      width: width.toDouble(),
+      height: height.toDouble(),
+      format: rd.PdfPageImageFormat.jpeg,
     );
 
     return pageImage!.bytes;

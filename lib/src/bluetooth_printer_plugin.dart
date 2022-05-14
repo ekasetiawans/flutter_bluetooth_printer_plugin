@@ -81,6 +81,8 @@ class BluetoothPrinter {
         printer: this,
       );
     }
+
+    return null;
   }
 
   Future<BluetoothDevice?> getConnectedDevice() async {

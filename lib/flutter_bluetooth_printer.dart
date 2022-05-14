@@ -12,7 +12,7 @@ import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:image/image.dart' as img;
-import 'package:native_pdf_renderer/native_pdf_renderer.dart' as rd;
+import 'package:pdfx/pdfx.dart' as rd;
 
 export 'package:esc_pos_utils_plus/esc_pos_utils.dart';
 
