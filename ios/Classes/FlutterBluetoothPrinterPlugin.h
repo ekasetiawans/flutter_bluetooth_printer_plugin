@@ -4,6 +4,12 @@
 
 #define NAMESPACE @"flutter_bluetooth_printer"
 
-@interface FlutterBluetoothPrinterPlugin : NSObject<FlutterPlugin>
+@interface FlutterBluetoothPrinterPlugin : NSObject<FlutterPlugin, FlutterStreamHandler>
 @property(nonatomic,copy)ConnectDeviceState state;
+@end
+
+@interface FlutterBluetoothDevice: NSObject
+@property NSString* address;
+- (id) initWithPeripheral:(CBPeripheral*)peripheral
+          binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger;
 @end

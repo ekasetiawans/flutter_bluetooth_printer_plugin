@@ -1,40 +1,81 @@
-part of bluetooth_printer;
+part of flutter_bluetooth_printer;
 
-class BluetoothDevice {
-  final String name;
-  final String address;
-  final int type;
+class _BluetoothDeviceImpl extends BluetoothDevice {
+  final MethodChannel _channel =
+      const MethodChannel('maseka.dev/bluetooth_printer');
+  late final MethodChannel _deviceChannel;
+
   bool _isConnected;
-  final BluetoothPrinter _plugin;
 
-  BluetoothDevice._internal({
-    required this.name,
-    required this.address,
-    required this.type,
+  _BluetoothDeviceImpl({
+    String? name,
+    required String address,
+    required int type,
     required bool isConnected,
-    required BluetoothPrinter printer,
-  })  : _plugin = printer,
-        _isConnected = isConnected;
+  })  : _isConnected = isConnected,
+        super(
+          name: name,
+          address: address,
+          type: type,
+        ) {
+    _deviceChannel = MethodChannel(
+      'maseka.dev/bluetooth_printer/$address',
+    );
+    _deviceChannel.setMethodCallHandler(_onCall);
+  }
 
+  void Function(int total, int progress)? _onProgress;
+  Future<dynamic> _onCall(MethodCall call) async {
+    switch (call.method) {
+      case 'onConnected':
+        _isConnected = call.arguments as bool;
+        break;
+
+      case 'onDisconnected':
+        _isConnected = false;
+        break;
+
+      case 'onPrintingProgress':
+        final int total = call.arguments['total'];
+        final int progress = call.arguments['progress'];
+        _onProgress?.call(total, progress);
+        break;
+
+      case 'error':
+        throw call.arguments as Exception;
+    }
+  }
+
+  @override
   Future<bool> connect() async {
-    _isConnected = await _plugin._connect(this);
+    _isConnected = await _channel.invokeMethod('connect', address);
     return _isConnected;
   }
 
+  @override
   bool get isConnected => _isConnected;
-  Future<void> disconnect() async {
-    return _plugin._channel.invokeMethod('disconnect');
+  @override
+  Future<bool> disconnect() async {
+    final result = await _deviceChannel.invokeMethod('disconnect');
+    if (result) {
+      _isConnected = false;
+    }
+
+    return result;
   }
 
+  @override
   Future<void> printBytes({
     required Uint8List bytes,
     void Function(int total, int progress)? progress,
   }) async {
+    if (!_isConnected) {
+      throw Exception('Device is not connected');
+    }
+
     final completer = Completer<bool>();
     StreamSubscription? listener;
-    listener = _plugin._printingProgress.stream.listen((event) {
-      final int t = event['total'];
-      final int p = event['progress'];
+    _onProgress = ((t, p) {
       if (progress != null) {
         progress(t, p);
       }
@@ -47,14 +88,15 @@ class BluetoothDevice {
       }
     });
 
-    await _plugin._channel.invokeMethod(
-      'print',
+    await _deviceChannel.invokeMethod(
+      'write',
       bytes,
     );
 
     await completer.future;
   }
 
+  @override
   Future<void> printImage({
     required img.Image image,
     PaperSize paperSize = PaperSize.mm58,
@@ -87,6 +129,7 @@ class BluetoothDevice {
     );
   }
 
+  @override
   Future<void> printPdf({
     required Uint8List data,
     int pageNumber = 1,

@@ -5,16 +5,6 @@
 
 library bluetooth_printer;
 
-import 'dart:async';
-import 'dart:typed_data';
-
-import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
-import 'package:image/image.dart' as img;
-import 'package:pdfx/pdfx.dart' as rd;
-
 export 'package:esc_pos_utils_plus/esc_pos_utils.dart';
 
-part 'src/bluetooth_device.dart';
-part 'src/bluetooth_printer_plugin.dart';
+export 'flutter_bluetooth_printer_library.dart';
