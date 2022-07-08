@@ -42,14 +42,14 @@
 }
 
 - (void) initialize:(void(^)(bool))callback {
-    if ([self isInitialized]){
+    if (self.isAvailable){
         callback(self.isAvailable);
         return;
     }
     
     self.isAvailable = false;
     [Manager didUpdateState:^(NSInteger state) {
-        self->_isAvailable = false;
+        self.isAvailable = false;
         
         switch (state) {
             case CBManagerStateUnsupported:
@@ -65,7 +65,7 @@
                 callback(false);
                 break;
             case CBManagerStatePoweredOn:
-                self->_isAvailable = true;
+                self.isAvailable = true;
                 NSLog(@"Bluetooth power on");
                 callback(true);
                 break;

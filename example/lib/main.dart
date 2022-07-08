@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
+import 'package:flutter_bluetooth_printer_example/build_pdf.dart';
 
 void main() {
   runApp(const MyApp());
@@ -118,7 +119,8 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: () async {
-                  //_device?.printImage(image: image);
+                  final data = await buildPdf();
+                  _device?.printPdf(data: data);
                 },
                 child: const Text('Print Image'),
               ),
