@@ -1,3 +1,7 @@
+## 2.1.0
+
+ - **FEAT**: added device selector and allow receipt widget.
+
 ## 2.0.0
 
 * 2022-07-08: Simplify usages
