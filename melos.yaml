@@ -1,0 +1,4 @@
+name: flutter_bluetooth_printer
+
+packages:
+  - packages/**

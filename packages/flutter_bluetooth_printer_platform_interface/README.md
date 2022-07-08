@@ -1,0 +1,3 @@
+# flutter_bluetooth_printer_platform_interface
+
+A flutter plugin platform interface for flutter_bluetooth_printer
