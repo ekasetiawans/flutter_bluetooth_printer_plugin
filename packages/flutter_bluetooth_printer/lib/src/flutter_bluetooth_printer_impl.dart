@@ -112,6 +112,17 @@ class FlutterBluetoothPrinter {
 
     return pageImage!.bytes;
   }
+
+  static Future<BluetoothDevice?> selectDevice(BuildContext context) async {
+    final selected = await showModalBottomSheet(
+      context: context,
+      builder: (context) => const BluetoothDeviceSelector(),
+    );
+    if (selected is BluetoothDevice) {
+      return selected;
+    }
+    return null;
+  }
 }
 
 class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
@@ -163,6 +174,11 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
     ProgressCallback? onProgress,
   }) async {
     _init();
+
+    // ensure device is available
+    await discovery
+        .firstWhere((element) => element.address == address)
+        .timeout(const Duration(seconds: 10));
 
     _progressCallback = onProgress;
     await channel.invokeMethod('write', {

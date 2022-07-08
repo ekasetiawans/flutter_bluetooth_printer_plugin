@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:flutter_bluetooth_printer_example/build_pdf.dart';
+import 'package:flutter_bluetooth_printer_example/receipt_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -63,10 +64,19 @@ class _HomePageState extends State<HomePage> {
           children: [
             ElevatedButton(
               onPressed: () async {
-                final selected = await showDialog(
-                  context: context,
-                  builder: (context) => const BluetoothDeviceSelector(),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ReceiptPage(),
+                  ),
                 );
+              },
+              child: const Text('Receipt'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final selected =
+                    await FlutterBluetoothPrinter.selectDevice(context);
                 if (selected is BluetoothDevice) {
                   setState(() {
                     _device = selected;
@@ -123,46 +133,6 @@ class _HomePageState extends State<HomePage> {
             ]
           ],
         ),
-      ),
-    );
-  }
-}
-
-class BluetoothDeviceSelector extends StatefulWidget {
-  const BluetoothDeviceSelector({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<BluetoothDeviceSelector> createState() =>
-      _BluetoothDeviceSelectorState();
-}
-
-class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: StreamBuilder<List<BluetoothDevice>>(
-        stream: FlutterBluetoothPrinter.discovery,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final devices = snapshot.data ?? [];
-          return ListView.builder(
-            itemCount: devices.length,
-            itemBuilder: (context, index) {
-              final device = devices.elementAt(index);
-              return ListTile(
-                title: Text(device.name),
-                onTap: () async {
-                  Navigator.pop(context, device);
-                },
-              );
-            },
-          );
-        },
       ),
     );
   }
