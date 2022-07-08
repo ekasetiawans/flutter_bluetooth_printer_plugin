@@ -6,10 +6,12 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.UUID;
@@ -54,29 +56,33 @@ public class FlutterBluetoothDevice implements MethodChannel.MethodCallHandler {
     }
 
     public void disconnect() throws IOException {
-        try {
-            if (bluetoothSocket == null) {
-                return;
+        synchronized (writeStream) {
+            try {
+                if (!bluetoothSocket.isConnected()) {
+                    return;
+                }
+
+                bluetoothSocket.close();
+
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    deviceChannel.invokeMethod("onDisconnected", true);
+                });
+            } finally {
+                this.disconnectCallback.onDisconnected();
             }
-
-            bluetoothSocket.close();
-
-            new Handler(Looper.getMainLooper()).post(() -> {
-                deviceChannel.invokeMethod("onDisconnected", true);
-            });
-        }finally {
-            this.disconnectCallback.onDisconnected();
         }
     }
 
     public void write(byte[] bytes) throws IOException{
-        if (writeStream == null) return;
-        updatePrintingProgress(bytes.length, 0);
+        synchronized (writeStream) {
+            if (writeStream == null) return;
+            updatePrintingProgress(bytes.length, 0);
 
-        writeStream.write(bytes);
-        writeStream.flush();
+            writeStream.write(bytes);
+            writeStream.flush();
 
-        updatePrintingProgress(bytes.length, bytes.length);
+            updatePrintingProgress(bytes.length, bytes.length);
+        }
     }
 
     private void updatePrintingProgress(long total, long progress){
@@ -94,24 +100,28 @@ public class FlutterBluetoothDevice implements MethodChannel.MethodCallHandler {
         switch (method){
             case "write" : {
                 AsyncTask.execute(() -> {
-                    try {
-                        final byte[] bytes = (byte[]) call.arguments;
-                        write(bytes);
-                    }catch (Exception e){
-                        new Handler(Looper.getMainLooper()).post(() -> {
-                            result.error("error", e.getMessage(), null);
-                        });
+                    synchronized (writeStream) {
+                        try {
+                            final byte[] bytes = (byte[]) call.arguments;
+                            write(bytes);
+                        } catch (Exception e) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                result.error("error", e.getMessage(), null);
+                            });
+                        }
                     }
                 });
             }
 
             case "disconnect": {
                 AsyncTask.execute(() -> {
-                    try {
-                        disconnect();
-                        result.success(true);
-                    }catch (Exception e){
-                        result.error("error", e.getMessage(), null);
+                    synchronized (writeStream) {
+                        try {
+                            disconnect();
+                            result.success(true);
+                        } catch (Exception e) {
+                            result.error("error", e.getMessage(), null);
+                        }
                     }
                 });
             }

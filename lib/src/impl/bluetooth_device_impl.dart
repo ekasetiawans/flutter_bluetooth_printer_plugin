@@ -32,7 +32,7 @@ class _BluetoothDeviceImpl extends BluetoothDevice {
         break;
 
       case 'onDisconnected':
-        _isConnected = false;
+        _isConnected = call.arguments as bool;
         break;
 
       case 'onPrintingProgress':

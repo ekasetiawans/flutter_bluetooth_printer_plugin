@@ -130,21 +130,30 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         switch (method) {
             case "connect": {
                 AsyncTask.execute(() -> {
-                    try {
-                        String address = (String) call.arguments;
-                        FlutterBluetoothDevice device = new FlutterBluetoothDevice(flutterPluginBinding.getBinaryMessenger(), bluetoothAdapter, address, () -> {
-                            connectedDevices.remove(address);
-                        });
+                    synchronized (connectedDevices) {
+                        try {
+                            String address = (String) call.arguments;
+                            if (connectedDevices.containsKey(address)){
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    result.success(true);
+                                });
+                                return;
+                            }
 
-                        device.connect();
-                        connectedDevices.put(address, device);
-                        new Handler(Looper.getMainLooper()).post(() -> {
-                            result.success(true);
-                        });
-                    } catch (Exception e) {
-                        new Handler(Looper.getMainLooper()).post(() -> {
-                            result.error("error", e.getMessage(), null);
-                        });
+                            FlutterBluetoothDevice device = new FlutterBluetoothDevice(flutterPluginBinding.getBinaryMessenger(), bluetoothAdapter, address, () -> {
+                                connectedDevices.remove(address);
+                            });
+
+                            device.connect();
+                            connectedDevices.put(address, device);
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                result.success(true);
+                            });
+                        } catch (Exception e) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                result.error("error", e.getMessage(), null);
+                            });
+                        }
                     }
                 });
 
@@ -153,22 +162,24 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
             case "dispose": {
                 AsyncTask.execute(()->{
-                    stopDiscovery();
-                    Object[] addresses = connectedDevices.keySet().toArray();
-                    for (Object address: addresses) {
-                        final FlutterBluetoothDevice device = connectedDevices.get(address.toString());
-                        if (device != null){
-                            try {
-                                device.disconnect();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                    synchronized (connectedDevices) {
+                        stopDiscovery();
+                        Object[] addresses = connectedDevices.keySet().toArray();
+                        for (Object address : addresses) {
+                            final FlutterBluetoothDevice device = connectedDevices.get(address.toString());
+                            if (device != null) {
+                                try {
+                                    device.disconnect();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-                    }
 
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        result.success(true);
-                    });
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            result.success(true);
+                        });
+                    }
                 });
                 break;
             }
