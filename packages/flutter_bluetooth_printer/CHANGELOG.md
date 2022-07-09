@@ -1,3 +1,9 @@
+## 2.2.0
+
+ - **REFACTOR**: refactor.
+ - **FIX**: update readme.
+ - **FEAT**: added BusyDeviceException.
+
 ## 2.1.0
 
  - **FEAT**: added device selector and allow receipt widget.

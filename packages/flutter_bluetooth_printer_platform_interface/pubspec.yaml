@@ -1,6 +1,6 @@
 name: flutter_bluetooth_printer_platform_interface
 description: Plugin platform interface for flutter_bluetooth_printer plugin.
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/ekasetiawans/flutter_bluetooth_printer_plugin/packages/flutter_bluetooth_printer_platform_interface
 
 environment:
