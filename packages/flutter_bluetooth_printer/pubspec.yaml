@@ -29,7 +29,7 @@ flutter:
       android:
         package: id.flutter.plugins
         pluginClass: FlutterBluetoothPrinterPlugin
-        dartPluginClass: FlutterBluetoothPrinterPlugin
+        dartPluginClass: FlutterBluetoothPrinter
       ios:
         pluginClass: FlutterBluetoothPrinterPlugin
-        dartPluginClass: FlutterBluetoothPrinterPlugin
+        dartPluginClass: FlutterBluetoothPrinter
