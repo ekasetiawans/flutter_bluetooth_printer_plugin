@@ -39,13 +39,13 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
 
 class BluetoothDevice {
   final String address;
-  final String name;
-  final int type;
+  final String? name;
+  final int? type;
 
   const BluetoothDevice({
     required this.address,
-    required this.name,
-    required this.type,
+    this.name,
+    this.type,
   });
 
   @override

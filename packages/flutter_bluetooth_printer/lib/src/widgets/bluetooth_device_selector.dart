@@ -39,7 +39,8 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
                 itemBuilder: (context, index) {
                   final device = devices.elementAt(index);
                   return ListTile(
-                    title: Text(device.name),
+                    title: Text(device.name ?? '(unknown)'),
+                    subtitle: Text(device.address),
                     leading: const Icon(Icons.bluetooth),
                     onTap: () async {
                       Navigator.pop(context, device);

@@ -36,11 +36,13 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
         (data) {
           return BluetoothDevice(
             address: data['address'],
-            name: data['name'] ?? '',
-            type: data['type'] ?? 1,
+            name: data['name'],
+            type: data['type'],
           );
         },
       );
+
+  bool _isBusy = false;
 
   @override
   Future<void> write({
@@ -48,18 +50,29 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
     required Uint8List data,
     ProgressCallback? onProgress,
   }) async {
-    _init();
+    try {
+      if (_isBusy) {
+        throw busyDeviceException;
+      }
 
-    // ensure device is available
-    await discovery
-        .firstWhere((element) => element.address == address)
-        .timeout(const Duration(seconds: 10));
+      _isBusy = true;
+      _init();
 
-    _progressCallback = onProgress;
-    await channel.invokeMethod('write', {
-      'address': address,
-      'data': data,
-    });
-    _progressCallback = null;
+      // ensure device is available
+      await discovery
+          .firstWhere((element) => element.address == address)
+          .timeout(const Duration(seconds: 10));
+
+      _progressCallback = onProgress;
+
+      await channel.invokeMethod('write', {
+        'address': address,
+        'data': data,
+      });
+
+      _progressCallback = null;
+    } finally {
+      _isBusy = false;
+    }
   }
 }
