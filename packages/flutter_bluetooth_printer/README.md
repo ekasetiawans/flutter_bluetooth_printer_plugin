@@ -1,18 +1,102 @@
 # flutter_bluetooth_printer
 
-A new flutter plugin project.
+A flutter plugin for print a receipt over bluetooth thermal printer.
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+Depend on it:
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```yaml
+  dependencies:
+    flutter_bluetooth_printer: any
+```
 
-The plugin project was generated without specifying the `--platforms` flag, no platforms are currently supported.
-To add platforms, run `flutter create -t plugin --platforms <platforms> .` under the same
-directory. You can also find a detailed instruction on how to add platforms in the `pubspec.yaml` at https://flutter.dev/docs/development/packages-and-plugins/developing-packages#plugin-platforms.
+Make your receipt
+
+```dart
+  ReceiptController? controller;
+
+  Widget build(BuildContext context){
+    return Receipt(
+        /// You can build your receipt widget that will be printed to the device
+        /// Note that, this feature is in experimental, you should make sure your widgets will be fit on every device.
+        builder: (context) => Column(
+            children: [
+                Text('Hello World'),
+            ]
+        ),
+        onInitialized: (controller) {
+            this.controller = controller;
+        },
+    );
+  }
+```
+
+Select a device and print:
+
+```dart
+    Future<void> print() async {
+        final device = await FlutterBluetoothPrinter.selectDevice(context);
+        if (device != null){
+            /// do print
+            controller?.print(address: device.address);
+        }
+    }
+```
+
+## Custom Device Selector
+
+You can make your own device selector using `FlutterBluetoothPrinter.discovery` stream to discover available devices.
+
+```dart
+  Widget build(BuilderContext context){
+    return StreamBuilder<List<BluetoothDevice>>(
+        stream: FlutterBluetoothPrinter.discovery,
+        builder: (context, snapshot){
+
+            final list = snapshot.data ?? <BluetoothDevice>[];
+            return ListView.builder(
+                itemCount: list.length,
+                itemBuilder: (context, index){
+                    final device = list.elementAt(index);
+                    return ListTile(
+                        title: Text(device.name ?? 'No Name'),
+                        subtitle: Text(device.address),
+                        onTap: (){
+                            // do anything
+                            FlutterBluetoothPrinter.printImage(
+                                address: device.address,
+                                image: // some image
+                            );
+                        }
+                    );
+                }
+            );
+        }
+    );
+  }
+
+```
+
+## Print PDF or Image
+
+You can print a PDF or an Image that contains your receipt design.
+For a PDF file, you can use any package that convert your PDF to an image.
+Then you can print it using command below:
+
+```dart
+FlutterBluetoothPrinter.printImage(...);
+```
+
+Note that, we are currently using package `image`.
+
+## Print Custom ESC/POS Command
+You still able to send an ESC/POS Command using command below:
+
+```dart
+FlutterBluetoothPrinter.printBytes(...);
+```
+
+## Do you like my work?
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/ekasetiawans)

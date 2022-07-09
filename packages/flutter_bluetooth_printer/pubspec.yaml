@@ -13,9 +13,6 @@ dependencies:
 
   image: ">=3.2.0 <=4.0.0"
   esc_pos_utils_plus: ">=2.0.1+6 <3.0.0"
-  pdf: ">=3.8.1 <4.0.0"
-  pdfx: ">=2.0.1+2 <3.0.0"
-
   flutter_bluetooth_printer_platform_interface: ^0.0.1
 
 dev_dependencies:

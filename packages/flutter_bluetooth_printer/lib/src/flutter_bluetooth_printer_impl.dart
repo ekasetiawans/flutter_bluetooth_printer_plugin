@@ -65,52 +65,6 @@ class FlutterBluetoothPrinter {
     );
   }
 
-  static Future<void> printPdf({
-    required String address,
-    required Uint8List data,
-    int pageNumber = 1,
-    PaperSize paperSize = PaperSize.mm58,
-    ProgressCallback? onProgress,
-  }) async {
-    final bytes = await _rasterPdf(
-      data: data,
-      pageNumber: pageNumber,
-      width: paperSize.width,
-    );
-
-    final image = img.decodeJpg(bytes);
-    if (image != null) {
-      return printImage(
-        address: address,
-        image: image,
-        paperSize: paperSize,
-        onProgress: onProgress,
-      );
-    }
-
-    throw Exception('Invalid JPG Image');
-  }
-
-  static Future<List<int>> _rasterPdf({
-    required Uint8List data,
-    required int pageNumber,
-    required int width,
-  }) async {
-    final doc = await rd.PdfDocument.openData(Uint8List.fromList(data));
-    final page = await doc.getPage(pageNumber);
-
-    double ratio = width / page.width;
-    int height = (page.height * ratio).ceil();
-
-    final pageImage = await page.render(
-      width: width.toDouble(),
-      height: height.toDouble(),
-      format: rd.PdfPageImageFormat.jpeg,
-    );
-
-    return pageImage!.bytes;
-  }
-
   static Future<BluetoothDevice?> selectDevice(BuildContext context) async {
     final selected = await showModalBottomSheet(
       context: context,
