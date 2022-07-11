@@ -1,3 +1,8 @@
+## 2.2.1
+
+ - **FIX**: multiple same device on discovery.
+ - **FIX**: pubspec.lock.
+
 ## 2.2.0
 
  - **REFACTOR**: refactor.
