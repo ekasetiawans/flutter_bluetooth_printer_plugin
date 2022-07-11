@@ -1,3 +1,7 @@
+## 2.2.2
+
+ - **FIX**: double discovered devices.
+
 ## 2.2.1
 
  - **FIX**: multiple same device on discovery.
