@@ -10,7 +10,7 @@ class FlutterBluetoothPrinter {
     await for (final device
         in FlutterBluetoothPrinterPlatform.instance.discovery) {
       result.add(device);
-      yield result;
+      yield result.toSet().toList();
     }
   }
 
