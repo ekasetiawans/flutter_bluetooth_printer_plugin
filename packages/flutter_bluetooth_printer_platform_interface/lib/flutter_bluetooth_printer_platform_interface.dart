@@ -14,6 +14,14 @@ enum BluetoothConnectionState {
   completed,
 }
 
+enum BluetoothState {
+  unknown, //0
+  disabled, //1
+  enabled, //2
+  notPermitted, //3
+  permitted, //4
+}
+
 abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
   static final Object _token = Object();
   static late FlutterBluetoothPrinterPlatform _instance;
@@ -28,6 +36,8 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
   final connectionStateNotifier = ValueNotifier<BluetoothConnectionState>(
     BluetoothConnectionState.idle,
   );
+
+  Stream<BluetoothState> get stateStream;
 
   Stream<BluetoothDevice> get discovery;
   Future<void> write({

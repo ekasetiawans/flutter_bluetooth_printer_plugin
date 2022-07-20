@@ -17,6 +17,9 @@ class FlutterBluetoothPrinter {
   static ValueNotifier<BluetoothConnectionState> get connectionStateNotifier =>
       FlutterBluetoothPrinterPlatform.instance.connectionStateNotifier;
 
+  static Stream<BluetoothState> get stateStream =>
+      FlutterBluetoothPrinterPlatform.instance.stateStream;
+
   static Stream<List<BluetoothDevice>> get discovery => _discovery();
 
   static Future<void> printBytes({

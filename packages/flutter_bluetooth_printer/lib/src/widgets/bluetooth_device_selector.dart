@@ -26,24 +26,46 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
           ),
         ),
         Expanded(
-          child: StreamBuilder<List<BluetoothDevice>>(
-            stream: FlutterBluetoothPrinter.discovery,
+          child: StreamBuilder<BluetoothState>(
+            stream: FlutterBluetoothPrinter.stateStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final devices = snapshot.data ?? [];
-              return ListView.builder(
-                itemCount: devices.length,
-                itemBuilder: (context, index) {
-                  final device = devices.elementAt(index);
-                  return ListTile(
-                    title: Text(device.name ?? '(unknown)'),
-                    subtitle: Text(device.address),
-                    leading: const Icon(Icons.bluetooth),
-                    onTap: () async {
-                      Navigator.pop(context, device);
+              final value = snapshot.data;
+              if (value == BluetoothState.notPermitted) {
+                return const Center(
+                  child: Text('Bluetooth is not permitted'),
+                );
+              }
+
+              if (value == BluetoothState.disabled) {
+                return const Center(
+                  child: Text('Bluetooth is disabled'),
+                );
+              }
+
+              return StreamBuilder<List<BluetoothDevice>>(
+                stream: FlutterBluetoothPrinter.discovery,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final devices = snapshot.data ?? [];
+                  return ListView.builder(
+                    itemCount: devices.length,
+                    itemBuilder: (context, index) {
+                      final device = devices.elementAt(index);
+                      return ListTile(
+                        title: Text(device.name ?? '(unknown)'),
+                        subtitle: Text(device.address),
+                        leading: const Icon(Icons.bluetooth),
+                        onTap: () async {
+                          Navigator.pop(context, device);
+                        },
+                      );
                     },
                   );
                 },
