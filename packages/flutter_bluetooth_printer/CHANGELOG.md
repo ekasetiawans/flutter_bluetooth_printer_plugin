@@ -1,3 +1,7 @@
+## 2.2.3
+
+ - **FIX**: android 10 permission.
+
 ## 2.2.2
 
  - **FIX**: double discovered devices.

@@ -1,3 +1,7 @@
+## 0.0.2+1
+
+ - **FIX**: android 10 permission.
+
 ## 0.0.2
 
  - **FEAT**: added BusyDeviceException.
