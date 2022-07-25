@@ -1,3 +1,8 @@
+## 2.3.0
+
+ - **FEAT**: imrpove state ios.
+ - **FEAT**: improve state (android).
+
 ## 2.2.3
 
  - **FIX**: android 10 permission.
