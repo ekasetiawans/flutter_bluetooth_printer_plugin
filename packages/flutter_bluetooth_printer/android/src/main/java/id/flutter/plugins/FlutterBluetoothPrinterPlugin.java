@@ -4,7 +4,6 @@ import static android.os.Build.VERSION.SDK_INT;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AsyncNotedAppOp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -18,16 +17,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -66,7 +60,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         discoveryChannel.setStreamHandler(this);
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        flutterPluginBinding.getApplicationContext().registerReceiver(receiver, filter);
+        flutterPluginBinding.getApplicationContext().registerReceiver(discoveryReceiver, filter);
 
         IntentFilter stateFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         flutterPluginBinding.getApplicationContext().registerReceiver(stateReceiver, stateFilter);
@@ -78,16 +72,20 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
             String action = intent.getAction();
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 final int value = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
-                if (value == BluetoothAdapter.STATE_ON) {
-                    channel.invokeMethod("onBluetoothStateChanged", 2);
-                } else if (value == BluetoothAdapter.STATE_OFF) {
-                    channel.invokeMethod("onBluetoothStateChanged", 1);
+                if (value == BluetoothAdapter.STATE_OFF) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("code", 1);
+                    for (EventChannel.EventSink sink : sinkList.values()) {
+                        sink.success(data);
+                    }
+                } else if (value == BluetoothAdapter.STATE_ON){
+                    startDiscovery(false);
                 }
             }
         }
     };
 
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+    private final BroadcastReceiver discoveryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -104,13 +102,14 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
     private Map<String, Object> deviceToMap(BluetoothDevice device) {
         final HashMap<String, Object> map = new HashMap<>();
+        map.put("code", 4);
         map.put("name", device.getName());
         map.put("address", device.getAddress());
         map.put("type", device.getType());
         return map;
     }
 
-    private boolean ensurePermission() {
+    private boolean ensurePermission(boolean request) {
         if (SDK_INT >= Build.VERSION_CODES.M) {
             if (SDK_INT >= 31) {
                  final boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
@@ -121,6 +120,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                      return true;
                  }
 
+                 if (!request) return false;
                 activity.requestPermissions(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, 919191);
             } else {
                 boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
@@ -131,6 +131,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                     return true;
                 }
 
+                if (!request) return false;
                 activity.requestPermissions(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 919191);
             }
 
@@ -140,14 +141,16 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         return true;
     }
 
-    private void startDiscovery() {
-        if (!ensurePermission()) {
+    private void startDiscovery(boolean requestPermission) {
+        if (!ensurePermission(requestPermission)) {
             return;
         }
 
-        if (!bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.startDiscovery();
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
         }
+
+        bluetoothAdapter.startDiscovery();
 
         Set<BluetoothDevice> bonded = bluetoothAdapter.getBondedDevices();
         for (BluetoothDevice device : bonded) {
@@ -180,7 +183,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         final String method = call.method;
         switch (method) {
             case "getState": {
-                if (!ensurePermission()){
+                if (!ensurePermission(false)){
                     result.success(3);
                     return;
                 }
@@ -262,7 +265,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
-        flutterPluginBinding.getApplicationContext().unregisterReceiver(receiver);
+        flutterPluginBinding.getApplicationContext().unregisterReceiver(discoveryReceiver);
         flutterPluginBinding.getApplicationContext().unregisterReceiver(stateReceiver);
     }
 
@@ -290,20 +293,41 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     @Override
     public boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 919191) {
-            for (int i = 0; i < grantResults.length; i++) {
-                final int result = grantResults[i];
+            for (final int result : grantResults) {
                 if (result != PackageManager.PERMISSION_GRANTED) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("code", 3);
+
                     for (EventChannel.EventSink sink : sinkList.values()) {
-                        sink.error("permissionDenied", permissions[i], "");
+                        sink.success(data);
                     }
 
-                    channel.invokeMethod("onBluetoothStateChanged", 3);
                     return true;
                 }
             }
 
-            channel.invokeMethod("onBluetoothStateChanged", 4);
-            startDiscovery();
+            if (!bluetoothAdapter.isEnabled()){
+                Map<String, Object> data = new HashMap<>();
+                data.put("code", 1);
+
+                for (EventChannel.EventSink sink : sinkList.values()) {
+                    sink.success(data);
+                }
+                return true;
+            }
+
+            final int state = bluetoothAdapter.getState();
+            if (state == BluetoothAdapter.STATE_OFF){
+                Map<String, Object> data = new HashMap<>();
+                data.put("code", 1);
+
+                for (EventChannel.EventSink sink : sinkList.values()) {
+                    sink.success(data);
+                }
+                return true;
+            }
+
+            startDiscovery(false);
             return true;
         }
 
@@ -315,7 +339,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
         sinkList.put(arguments, events);
-        startDiscovery();
+        startDiscovery(true);
     }
 
     @Override

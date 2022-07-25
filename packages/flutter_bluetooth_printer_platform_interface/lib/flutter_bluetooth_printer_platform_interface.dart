@@ -22,6 +22,8 @@ enum BluetoothState {
   permitted, //4
 }
 
+abstract class DiscoveryState {}
+
 abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
   static final Object _token = Object();
   static late FlutterBluetoothPrinterPlatform _instance;
@@ -37,9 +39,8 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
     BluetoothConnectionState.idle,
   );
 
-  Stream<BluetoothState> get stateStream;
+  Stream<DiscoveryState> get discovery;
 
-  Stream<BluetoothDevice> get discovery;
   Future<void> write({
     required String address,
     required Uint8List data,
@@ -47,12 +48,12 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
   });
 }
 
-class BluetoothDevice {
+class BluetoothDevice extends DiscoveryState {
   final String address;
   final String? name;
   final int? type;
 
-  const BluetoothDevice({
+  BluetoothDevice({
     required this.address,
     this.name,
     this.type,

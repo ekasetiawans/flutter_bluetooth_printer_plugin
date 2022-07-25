@@ -1,13 +1,19 @@
 part of flutter_bluetooth_printer;
 
+class UnknownState extends DiscoveryState {}
+
+class PermissionRestrictedState extends DiscoveryState {}
+
+class BluetoothDisabledState extends DiscoveryState {}
+
+class BluetoothEnabledState extends DiscoveryState {}
+
 class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
   final channel = const MethodChannel('maseka.dev/flutter_bluetooth_printer');
   final discoveryChannel =
       const EventChannel('maseka.dev/flutter_bluetooth_printer/discovery');
 
   ProgressCallback? _progressCallback;
-  final StreamController<BluetoothState> _stateController =
-      StreamController.broadcast();
 
   bool _isInitialized = false;
   void _init() {
@@ -25,11 +31,6 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
           final total = call.arguments['total'] as int;
           final progress = call.arguments['progress'] as int;
           _progressCallback?.call(total, progress);
-          break;
-
-        case 'onBluetoothStateChanged':
-          final value = call.arguments as int;
-          _stateController.sink.add(_intToState(value));
           break;
       }
       return true;
@@ -57,18 +58,51 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
     return BluetoothState.unknown;
   }
 
-  @override
-  Stream<BluetoothDevice> get discovery => discoveryChannel
-          .receiveBroadcastStream(DateTime.now().millisecondsSinceEpoch)
-          .map(
-        (data) {
+  Stream<DiscoveryState> _discovery() async* {
+    final result = await channel.invokeMethod('getState');
+    final state = _intToState(result);
+    if (state == BluetoothState.notPermitted) {
+      yield PermissionRestrictedState();
+    }
+
+    if (state == BluetoothState.disabled) {
+      yield BluetoothDisabledState();
+    }
+
+    yield* discoveryChannel
+        .receiveBroadcastStream(DateTime.now().millisecondsSinceEpoch)
+        .map(
+      (data) {
+        final code = data['code'];
+        final state = _intToState(code);
+
+        if (state == BluetoothState.notPermitted) {
+          return PermissionRestrictedState();
+        }
+
+        if (state == BluetoothState.disabled) {
+          return BluetoothDisabledState();
+        }
+
+        if (state == BluetoothState.enabled) {
+          return BluetoothEnabledState();
+        }
+
+        if (state == BluetoothState.permitted) {
           return BluetoothDevice(
             address: data['address'],
             name: data['name'],
             type: data['type'],
           );
-        },
-      );
+        }
+
+        return UnknownState();
+      },
+    );
+  }
+
+  @override
+  Stream<DiscoveryState> get discovery => _discovery();
 
   bool _isBusy = false;
 
@@ -88,7 +122,8 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
 
       // ensure device is available
       await discovery
-          .firstWhere((element) => element.address == address)
+          .firstWhere((element) =>
+              element is BluetoothDevice && element.address == address)
           .timeout(const Duration(seconds: 10));
 
       _progressCallback = onProgress;
@@ -102,15 +137,5 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
     } finally {
       _isBusy = false;
     }
-  }
-
-  @override
-  Stream<BluetoothState> get stateStream => _stateStream();
-
-  Stream<BluetoothState> _stateStream() async* {
-    _init();
-    final result = await channel.invokeMethod('getState');
-    yield _intToState(result);
-    yield* _stateController.stream;
   }
 }

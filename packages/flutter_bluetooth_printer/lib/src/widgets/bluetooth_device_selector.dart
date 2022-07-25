@@ -1,8 +1,14 @@
 part of flutter_bluetooth_printer;
 
 class BluetoothDeviceSelector extends StatefulWidget {
+  final Widget? disabledWidget;
+  final Widget? permissionRestrictedWidget;
+  final Widget? title;
   const BluetoothDeviceSelector({
     Key? key,
+    this.disabledWidget,
+    this.permissionRestrictedWidget,
+    this.title,
   }) : super(key: key);
 
   @override
@@ -16,56 +22,55 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Choose a device',
-            style: TextStyle(
-              fontSize: 18,
-            ),
-          ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: widget.title ??
+              const Text(
+                'Choose a device',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
         ),
         Expanded(
-          child: StreamBuilder<BluetoothState>(
-            stream: FlutterBluetoothPrinter.stateStream,
+          child: StreamBuilder<DiscoveryState>(
+            stream: FlutterBluetoothPrinter.discovery,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final value = snapshot.data;
-              if (value == BluetoothState.notPermitted) {
-                return const Center(
-                  child: Text('Bluetooth is not permitted'),
-                );
+              final data = snapshot.data;
+
+              if (data is BluetoothDisabledState) {
+                return widget.disabledWidget ??
+                    const Center(
+                      child: Text('Bluetooth is disabled'),
+                    );
               }
 
-              if (value == BluetoothState.disabled) {
-                return const Center(
-                  child: Text('Bluetooth is disabled'),
-                );
+              if (data is PermissionRestrictedState) {
+                return widget.permissionRestrictedWidget ??
+                    const Center(
+                      child: Text('Bluetooth is not permitted'),
+                    );
               }
 
-              return StreamBuilder<List<BluetoothDevice>>(
-                stream: FlutterBluetoothPrinter.discovery,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              if (data is BluetoothEnabledState) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                  final devices = snapshot.data ?? [];
-                  return ListView.builder(
-                    itemCount: devices.length,
-                    itemBuilder: (context, index) {
-                      final device = devices.elementAt(index);
-                      return ListTile(
-                        title: Text(device.name ?? '(unknown)'),
-                        subtitle: Text(device.address),
-                        leading: const Icon(Icons.bluetooth),
-                        onTap: () async {
-                          Navigator.pop(context, device);
-                        },
-                      );
+              final devices = (data as DiscoveryResult).devices;
+              return ListView.builder(
+                itemCount: devices.length,
+                itemBuilder: (context, index) {
+                  final device = devices.elementAt(index);
+                  return ListTile(
+                    title: Text(device.name ?? '(unknown)'),
+                    subtitle: Text(device.address),
+                    leading: const Icon(Icons.bluetooth),
+                    onTap: () async {
+                      Navigator.pop(context, device);
                     },
                   );
                 },

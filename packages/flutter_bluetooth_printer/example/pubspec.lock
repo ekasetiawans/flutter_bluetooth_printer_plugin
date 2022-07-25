@@ -159,14 +159,14 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.2.0"
+    version: "2.2.3"
   flutter_bluetooth_printer_platform_interface:
     dependency: "direct overridden"
     description:
       path: "../../flutter_bluetooth_printer_platform_interface"
       relative: true
     source: path
-    version: "0.0.2"
+    version: "0.0.2+1"
   flutter_lints:
     dependency: "direct dev"
     description:

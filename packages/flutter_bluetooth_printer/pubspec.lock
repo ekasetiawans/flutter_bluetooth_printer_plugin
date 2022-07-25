@@ -89,7 +89,7 @@ packages:
       path: "../flutter_bluetooth_printer_platform_interface"
       relative: true
     source: path
-    version: "0.0.2"
+    version: "0.0.2+1"
   flutter_lints:
     dependency: "direct dev"
     description:

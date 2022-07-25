@@ -1,26 +1,33 @@
 part of flutter_bluetooth_printer;
 
+class DiscoveryResult extends DiscoveryState {
+  final List<BluetoothDevice> devices;
+  DiscoveryResult({required this.devices});
+}
+
 class FlutterBluetoothPrinter {
   static void registerWith() {
     FlutterBluetoothPrinterPlatform.instance = _MethodChannelBluetoothPrinter();
   }
 
-  static Stream<List<BluetoothDevice>> _discovery() async* {
+  static Stream<DiscoveryState> _discovery() async* {
     final result = <BluetoothDevice>[];
-    await for (final device
+    await for (final state
         in FlutterBluetoothPrinterPlatform.instance.discovery) {
-      result.add(device);
-      yield result.toSet().toList();
+      if (state is BluetoothDevice) {
+        result.add(state);
+        yield DiscoveryResult(devices: result.toSet().toList());
+      } else {
+        result.clear();
+        yield state;
+      }
     }
   }
 
   static ValueNotifier<BluetoothConnectionState> get connectionStateNotifier =>
       FlutterBluetoothPrinterPlatform.instance.connectionStateNotifier;
 
-  static Stream<BluetoothState> get stateStream =>
-      FlutterBluetoothPrinterPlatform.instance.stateStream;
-
-  static Stream<List<BluetoothDevice>> get discovery => _discovery();
+  static Stream<DiscoveryState> get discovery => _discovery();
 
   static Future<void> printBytes({
     required String address,
