@@ -12,6 +12,7 @@
 
 @property(nonatomic) bool isAvailable;
 @property(nonatomic) bool isInitialized;
+@property(nonatomic) bool isPermitted;
 @end
 
 @implementation FlutterBluetoothPrinterPlugin
@@ -50,22 +51,38 @@
     self.isAvailable = false;
     [Manager didUpdateState:^(NSInteger state) {
         self.isAvailable = false;
+        self.isPermitted = false;
 
         switch (state) {
             case CBManagerStateUnsupported:
                 NSLog(@"The platform/hardware doesn't support Bluetooth Low Energy.");
                 callback(false);
                 break;
-            case CBManagerStateUnauthorized:
-                NSLog(@"The app is not authorized to use Bluetooth Low Energy.");
-                callback(false);
+            case CBManagerStateUnauthorized: {
+                    self.isPermitted = false;
+                    NSLog(@"The app is not authorized to use Bluetooth Low Energy.");
+                    callback(false);
+                    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:@3,@"code",nil];
+                    for (id key in self.eventSinks) {
+                        FlutterEventSink sink = (FlutterEventSink) [self.eventSinks objectForKey:key];
+                        sink(data);
+                    }
+                }
                 break;
-            case CBManagerStatePoweredOff:
-                NSLog(@"Bluetooth is currently powered off.");
-                callback(false);
+            case CBManagerStatePoweredOff: {
+                    NSLog(@"Bluetooth is currently powered off.");
+                    callback(false);
+                    
+                    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:@1,@"code",nil];
+                    for (id key in self.eventSinks) {
+                        FlutterEventSink sink = (FlutterEventSink) [self.eventSinks objectForKey:key];
+                        sink(data);
+                    }
+                }
                 break;
             case CBManagerStatePoweredOn:
                 self.isAvailable = true;
+                self.isPermitted = true;
                 NSLog(@"Bluetooth power on");
                 callback(true);
                 break;
@@ -130,6 +147,19 @@
                 }
             }
         }];
+    } else if ([@"getState" isEqualToString:call.method]){
+        if (!self.isAvailable){
+            result(@1);
+            return;
+        }
+        
+        if (!self.isPermitted){
+            result(@3);
+            return;
+        }
+        
+        result(@2);
+        return;
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -160,9 +190,7 @@
 
                     NSDictionary *device = [self deviceToMap:peripheral];
                     for (id key in self.eventSinks) {
-                        
-                        
-                        
+                    
                         FlutterEventSink sink = (FlutterEventSink) [self.eventSinks objectForKey:key];
                         sink(device);
                     }
@@ -179,7 +207,7 @@
         isConnected = true;
     }
 
-    NSDictionary *device = [NSDictionary dictionaryWithObjectsAndKeys:peripheral.identifier.UUIDString,@"address",peripheral.name,@"name",@1,@"type", @(isConnected), @"is_connected",nil];
+    NSDictionary *device = [NSDictionary dictionaryWithObjectsAndKeys:@4,@"code",peripheral.identifier.UUIDString,@"address",peripheral.name,@"name",@1,@"type", @(isConnected), @"is_connected",nil];
 
     return device;
 }
