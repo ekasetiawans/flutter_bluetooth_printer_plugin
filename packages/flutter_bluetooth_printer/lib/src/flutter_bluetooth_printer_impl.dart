@@ -46,8 +46,16 @@ class FlutterBluetoothPrinter {
     required img.Image image,
     PaperSize paperSize = PaperSize.mm58,
     ProgressCallback? onProgress,
+    int addFeeds = 0,
   }) async {
     img.Image src;
+    image = img.pixelate(
+      image,
+      (image.width / paperSize.width).round(),
+      mode: img.PixelateMode.average,
+    );
+
+    image = _blackwhite(image);
 
     final dotsPerLine = paperSize.width;
 
@@ -65,14 +73,50 @@ class FlutterBluetoothPrinter {
     }
 
     final profile = await CapabilityProfile.load();
-    final generator = Generator(paperSize, profile);
+    final generator = Generator(
+      paperSize,
+      profile,
+      spaceBetweenRows: 0,
+    );
     final data = generator.image(src);
+
+    final additional = generator.emptyLines(addFeeds);
 
     return printBytes(
       address: address,
-      data: Uint8List.fromList(data),
+      data: Uint8List.fromList([...generator.reset(), ...data, ...additional]),
       onProgress: onProgress,
     );
+  }
+
+  static img.Image _blackwhite(img.Image src) {
+    final w = src.width;
+    final h = src.height;
+
+    final res = img.Image(w, h);
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        final idx = y * w + x;
+
+        final pixel = src[idx];
+        final r = img.getRed(pixel);
+        final b = img.getBlue(pixel);
+        final g = img.getGreen(pixel);
+
+        int c;
+        final l = img.getLuminanceRgb(r, g, b) / 255;
+        if (l > 0.8) {
+          c = img.getColor(255, 255, 255);
+        } else {
+          c = img.getColor(0, 0, 0);
+        }
+
+        final u = BigInt.from(c).toUnsigned(32);
+        res[idx] = u.toInt();
+      }
+    }
+
+    return res;
   }
 
   static Future<BluetoothDevice?> selectDevice(BuildContext context) async {

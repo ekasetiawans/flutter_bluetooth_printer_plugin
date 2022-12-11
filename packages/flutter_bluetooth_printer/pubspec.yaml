@@ -29,3 +29,8 @@ flutter:
       ios:
         pluginClass: FlutterBluetoothPrinterPlugin
         dartPluginClass: FlutterBluetoothPrinter
+
+  fonts:
+    - family: HermeneusOne
+      fonts:
+        - asset: fonts/HermeneusOne-Regular.ttf

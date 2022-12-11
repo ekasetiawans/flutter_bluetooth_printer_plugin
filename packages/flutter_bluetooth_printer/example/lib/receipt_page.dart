@@ -42,48 +42,70 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const FittedBox(
-                      fit: BoxFit.cover,
-                      child: Text(
-                        'PURCHASE RECEIPT',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                    Image.asset(
+                      'assets/logo.webp',
+                      fit: BoxFit.fitHeight,
+                      height: 200,
+                    ),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxHeight: 36,
+                      ),
+                      child: const FittedBox(
+                        fit: BoxFit.contain,
+                        child: Text(
+                          'PURCHASE RECEIPT',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                    const Divider(thickness: 4),
-                    Row(
+                    const Divider(thickness: 2),
+                    Table(
+                      columnWidths: const {
+                        1: IntrinsicColumnWidth(),
+                      },
                       children: const [
-                        Text(
-                          'Date:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        TableRow(
+                          children: [
+                            Text('ORANGE JUICE'),
+                            Text(r'$2'),
+                          ],
                         ),
-                        SizedBox(width: 8),
-                        Text(
-                          '2020-01-01',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        TableRow(
+                          children: [
+                            Text('CAPPUCINO MEDIUM SIZE'),
+                            Text(r'$2.9'),
+                          ],
+                        ),
+                        TableRow(
+                          children: [
+                            Text('BEEF PIZZA'),
+                            Text(r'$15.9'),
+                          ],
+                        ),
+                        TableRow(
+                          children: [
+                            Text('ORANGE JUICE'),
+                            Text(r'$2'),
+                          ],
+                        ),
+                        TableRow(
+                          children: [
+                            Text('CAPPUCINO MEDIUM SIZE'),
+                            Text(r'$2.9'),
+                          ],
+                        ),
+                        TableRow(
+                          children: [
+                            Text('BEEF PIZZA'),
+                            Text(r'$15.9'),
+                          ],
                         ),
                       ],
                     ),
-                    const Divider(thickness: 4),
-                    for (int i = 0; i < 10; i++)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '${i + 1}. Product',
-                            ),
-                          ),
-                          const Text(
-                            '10000',
-                          ),
-                        ],
-                      ),
-                    const Divider(thickness: 4),
+                    const Divider(thickness: 2),
                     FittedBox(
                       fit: BoxFit.cover,
                       child: Row(
@@ -91,21 +113,28 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           Text(
                             'TOTAL',
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
                           SizedBox(width: 16),
                           Text(
-                            '23456780',
+                            r'$200',
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Divider(thickness: 4),
+                    const Divider(thickness: 2),
                     const Text('Thank you for your purchase!'),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: Image.asset(
+                        'assets/qrcode.png',
+                        width: 150,
+                      ),
+                    ),
                   ],
                 );
               },
@@ -121,7 +150,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
                       ?.address;
 
               if (selectedAddress != null) {
-                controller?.print(address: selectedAddress);
+                controller?.print(
+                  address: selectedAddress,
+                  linesAfter: 2,
+                );
               }
             },
             child: const Text('PRINT'),
