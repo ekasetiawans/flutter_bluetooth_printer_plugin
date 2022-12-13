@@ -1,3 +1,7 @@
+## 2.5.0
+
+ - **FEAT**: added option to useImageRaster while print.
+
 ## 2.4.0
 
  - **FEAT**: reimplements ios native platform.
