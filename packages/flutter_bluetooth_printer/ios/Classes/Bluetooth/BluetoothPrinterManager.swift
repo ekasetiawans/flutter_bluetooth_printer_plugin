@@ -289,10 +289,10 @@ public class BluetoothPrinterManager {
             
             let contentData = content.data(using: encoding)[0]
             let total = contentData.endIndex
+            let chunkSize = p.maximumWriteValueLength(for: .withResponse)
             
-            let task = PrintingTask(source: contentData, peripheral: p, characteristic: c, size: total/5)
+            let task = PrintingTask(source: contentData, peripheral: p, characteristic: c, size: chunkSize)
             var offset = 0
-            
             
             self.peripheralDelegate.didWriteData = { (peripheral, error) in
                 if error != nil {
