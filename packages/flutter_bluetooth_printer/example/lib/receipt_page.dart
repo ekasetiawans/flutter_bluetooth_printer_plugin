@@ -139,26 +139,152 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 );
               },
               onInitialized: (controller) {
-                this.controller = controller;
+                setState(() {
+                  this.controller = controller;
+                });
               },
             ),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final selectedAddress = address ??
-                  (await FlutterBluetoothPrinter.selectDevice(context))
-                      ?.address;
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: PopupMenuButton<PaperSize>(
+                      initialValue: controller?.paperSize,
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          child: Text('58mm'),
+                          value: PaperSize.mm58,
+                        ),
+                        const PopupMenuItem(
+                          child: Text('72mm'),
+                          value: PaperSize.mm72,
+                        ),
+                        const PopupMenuItem(
+                          child: Text('80mm'),
+                          value: PaperSize.mm80,
+                        ),
+                      ],
+                      onSelected: (value) {
+                        setState(() {
+                          controller?.paperSize = value;
+                        });
+                      },
+                      child: Text(controller?.paperSize.name ?? ''),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final selectedAddress = address ??
+                            (await FlutterBluetoothPrinter.selectDevice(
+                                    context))
+                                ?.address;
 
-              if (selectedAddress != null) {
-                controller?.print(
-                  address: selectedAddress,
-                  linesAfter: 2,
-                );
-              }
-            },
-            child: const Text('PRINT'),
+                        if (selectedAddress != null) {
+                          PrintingProgressDialog.print(
+                            context,
+                            device: selectedAddress,
+                            controller: controller!,
+                          );
+                        }
+                      },
+                      child: const Text('PRINT'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PrintingProgressDialog extends StatefulWidget {
+  final String device;
+  final ReceiptController controller;
+  const PrintingProgressDialog({
+    Key? key,
+    required this.device,
+    required this.controller,
+  }) : super(key: key);
+
+  @override
+  State<PrintingProgressDialog> createState() => _PrintingProgressDialogState();
+  static void print(
+    BuildContext context, {
+    required String device,
+    required ReceiptController controller,
+  }) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => PrintingProgressDialog(
+        controller: controller,
+        device: device,
+      ),
+    );
+  }
+}
+
+class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
+  double? progress;
+  @override
+  void initState() {
+    super.initState();
+    widget.controller
+        .print(
+      address: widget.device,
+      linesAfter: 2,
+      onProgress: (total, sent) {
+        if (mounted) {
+          setState(() {
+            progress = sent / total;
+          });
+        }
+      },
+    )
+        .then((value) {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Printing Receipt',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Colors.grey.shade200,
+            ),
+            const SizedBox(height: 4),
+            Text('Processing: ${((progress ?? 0) * 100).round()}%')
+          ],
+        ),
       ),
     );
   }

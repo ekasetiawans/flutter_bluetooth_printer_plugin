@@ -2,7 +2,7 @@ PODS:
   - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_bluetooth_printer (1.1.5):
+  - flutter_bluetooth_printer (2.0.0):
     - Flutter
   - pdfx (1.0.0):
     - Flutter
@@ -26,7 +26,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_bluetooth_printer: b2887979ad000b1fc2931a0b9f5b06d7286b8cf0
+  flutter_bluetooth_printer: 03d6206c1cb42dc233d3d30b0071fac068c184fd
   pdfx: 3ffc52fcfed6c12ebc7fee5a9b9a47e85389dfda
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3

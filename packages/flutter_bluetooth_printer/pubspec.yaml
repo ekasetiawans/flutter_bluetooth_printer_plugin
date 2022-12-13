@@ -14,6 +14,7 @@ dependencies:
   image: ">=3.2.0 <=4.0.0"
   esc_pos_utils_plus: ">=2.0.1+6 <3.0.0"
   flutter_bluetooth_printer_platform_interface: ^0.0.3
+  plugin_platform_interface: ^2.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

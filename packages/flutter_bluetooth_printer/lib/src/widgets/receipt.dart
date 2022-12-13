@@ -14,11 +14,19 @@ extension PaperSizeName on PaperSize {
   }
 }
 
-class ReceiptController {
-  final ReceiptState state;
+class ReceiptController with ChangeNotifier {
+  final ReceiptState _state;
+
+  PaperSize _paperSize = PaperSize.mm58;
+  PaperSize get paperSize => _paperSize;
+  set paperSize(PaperSize size) {
+    _paperSize = size;
+    notifyListeners();
+  }
+
   ReceiptController._({
-    required this.state,
-  });
+    required ReceiptState state,
+  }) : _state = state;
 
   Future<void> print({
     required String address,
@@ -27,7 +35,7 @@ class ReceiptController {
     /// add lines after print
     int linesAfter = 0,
   }) {
-    return state.print(
+    return _state.print(
       address: address,
       onProgress: onProgress,
       addFeeds: linesAfter,
@@ -37,10 +45,14 @@ class ReceiptController {
 
 class Receipt extends StatefulWidget {
   final WidgetBuilder builder;
+  final Color backgroundColor;
+  final TextStyle? defaultTextStyle;
   final void Function(ReceiptController controller) onInitialized;
 
   const Receipt({
     Key? key,
+    this.defaultTextStyle,
+    this.backgroundColor = Colors.grey,
     required this.builder,
     required this.onInitialized,
   }) : super(key: key);
@@ -52,88 +64,68 @@ class Receipt extends StatefulWidget {
 class ReceiptState extends State<Receipt> {
   final _localKey = GlobalKey();
   PaperSize _paperSize = PaperSize.mm58;
+  late ReceiptController controller;
 
   @override
   void initState() {
     super.initState();
-    widget.onInitialized(ReceiptController._(state: this));
+    controller = ReceiptController._(state: this);
+    controller.addListener(_listener);
+    Future.microtask(() {
+      widget.onInitialized(controller);
+    });
+  }
+
+  void _listener() {
+    if (controller._paperSize != _paperSize) {
+      if (mounted) {
+        setState(() {
+          _paperSize = controller._paperSize;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(_listener);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.grey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.receipt),
-              title: const Text('Paper Size:'),
-              trailing: PopupMenuButton<PaperSize>(
-                initialValue: _paperSize,
-                onSelected: (value) {
-                  setState(() {
-                    _paperSize = value;
-                  });
-                },
-                itemBuilder: (context) => const [
-                  PopupMenuItem(
-                    value: PaperSize.mm58,
-                    child: Text('58mm'),
-                  ),
-                  PopupMenuItem(
-                    value: PaperSize.mm72,
-                    child: Text('72mm'),
-                  ),
-                  PopupMenuItem(
-                    value: PaperSize.mm80,
-                    child: Text('80mm'),
-                  ),
-                ],
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(_paperSize.name),
-                    const Icon(Icons.arrow_drop_down),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ClipRect(
-              clipBehavior: Clip.hardEdge,
-              child: Container(
-                alignment: Alignment.center,
-                child: FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: InteractiveViewer(
-                    boundaryMargin: EdgeInsets.zero,
-                    clipBehavior: Clip.none,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        color: Colors.white,
-                        child: RepaintBoundary(
-                          key: _localKey,
-                          child: Container(
-                            color: Colors.white,
-                            child: DefaultTextStyle.merge(
-                              style: const TextStyle(
-                                fontSize: 24,
-                                height: 1.1,
-                                color: Colors.black,
-                                fontFamily: 'HermeneusOne',
-                                package: 'flutter_bluetooth_printer',
-                              ),
-                              child: SizedBox(
-                                width: _paperSize.width.toDouble(),
-                                child: Builder(builder: widget.builder),
-                              ),
+      color: widget.backgroundColor,
+      child: ClipRect(
+        clipBehavior: Clip.hardEdge,
+        child: Container(
+          alignment: Alignment.center,
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: InteractiveViewer(
+              boundaryMargin: EdgeInsets.zero,
+              clipBehavior: Clip.none,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  color: Colors.white,
+                  child: RepaintBoundary(
+                    key: _localKey,
+                    child: Container(
+                      color: Colors.white,
+                      child: DefaultTextStyle.merge(
+                        style: widget.defaultTextStyle ??
+                            const TextStyle(
+                              fontSize: 24,
+                              height: 1.1,
+                              color: Colors.black,
+                              fontFamily: 'HermeneusOne',
+                              package: 'flutter_bluetooth_printer',
                             ),
-                          ),
+                        child: SizedBox(
+                          width: _paperSize.width.toDouble(),
+                          child: Builder(builder: widget.builder),
                         ),
                       ),
                     ),
@@ -142,7 +134,7 @@ class ReceiptState extends State<Receipt> {
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

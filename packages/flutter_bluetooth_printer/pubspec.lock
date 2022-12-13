@@ -79,9 +79,9 @@ packages:
   flutter_bluetooth_printer_platform_interface:
     dependency: "direct main"
     description:
-      name: flutter_bluetooth_printer_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../flutter_bluetooth_printer_platform_interface"
+      relative: true
+    source: path
     version: "0.0.3"
   flutter_lints:
     dependency: "direct dev"
