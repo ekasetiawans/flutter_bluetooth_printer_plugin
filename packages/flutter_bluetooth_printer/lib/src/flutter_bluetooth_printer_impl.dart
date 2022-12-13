@@ -43,36 +43,22 @@ class FlutterBluetoothPrinter {
 
   static Future<void> printImage({
     required String address,
-    required img.Image image,
+    required List<int> imageBytes,
+    required int imageWidth,
+    required int imageHeight,
     PaperSize paperSize = PaperSize.mm58,
     ProgressCallback? onProgress,
     int addFeeds = 0,
     bool useImageRaster = false,
   }) async {
-    img.Image src;
-    image = img.pixelate(
-      image,
-      (image.width / paperSize.width).round(),
-      mode: img.PixelateMode.average,
+    final bytes = await _optimizeImage(
+      paperSize: paperSize,
+      src: imageBytes,
+      srcWidth: imageWidth,
+      srcHeight: imageHeight,
     );
 
-    image = _blackwhite(image);
-
-    final dotsPerLine = paperSize.width;
-
-    // make sure image not bigger than printable area
-    if (image.width > dotsPerLine) {
-      double ratio = dotsPerLine / image.width;
-      int height = (image.height * ratio).ceil();
-      src = img.copyResize(
-        image,
-        width: dotsPerLine,
-        height: height,
-      );
-    } else {
-      src = image;
-    }
-
+    final src = img.decodeJpg(bytes)!;
     final profile = await CapabilityProfile.load();
     final generator = Generator(
       paperSize,
@@ -108,7 +94,33 @@ class FlutterBluetoothPrinter {
     );
   }
 
-  static img.Image _blackwhite(img.Image src) {
+  static Future<List<int>> _optimizeImage({
+    required List<int> src,
+    required PaperSize paperSize,
+    required int srcWidth,
+    required int srcHeight,
+  }) async {
+    final arg = <String, dynamic>{
+      'src': src,
+      'width': srcWidth,
+      'height': srcHeight,
+      'paperSize': paperSize,
+    };
+
+    if (kIsWeb) {
+      return _blackwhiteInternal(arg);
+    }
+
+    return compute(_blackwhiteInternal, arg);
+  }
+
+  static Future<List<int>> _blackwhiteInternal(Map<String, dynamic> arg) async {
+    final srcBytes = arg['src'] as List<int>;
+    final width = arg['width'] as int;
+    final height = arg['height'] as int;
+    final paperSize = arg['paperSize'] as PaperSize;
+
+    img.Image src = img.Image.fromBytes(width, height, srcBytes);
     final w = src.width;
     final h = src.height;
 
@@ -135,7 +147,23 @@ class FlutterBluetoothPrinter {
       }
     }
 
-    return res;
+    final image = img.pixelate(res, 2, mode: img.PixelateMode.average);
+    final dotsPerLine = paperSize.width;
+
+    // make sure image not bigger than printable area
+    if (image.width > dotsPerLine) {
+      double ratio = dotsPerLine / image.width;
+      int height = (image.height * ratio).ceil();
+      src = img.copyResize(
+        image,
+        width: dotsPerLine,
+        height: height,
+      );
+    } else {
+      src = image;
+    }
+
+    return img.encodeJpg(src);
   }
 
   static Future<BluetoothDevice?> selectDevice(BuildContext context) async {

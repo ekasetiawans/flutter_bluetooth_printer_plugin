@@ -37,6 +37,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
         children: [
           Expanded(
             child: Receipt(
+              backgroundColor: Colors.grey.shade200,
               builder: (context) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,

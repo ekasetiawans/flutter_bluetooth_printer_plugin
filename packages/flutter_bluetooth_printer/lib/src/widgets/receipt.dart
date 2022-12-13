@@ -147,18 +147,18 @@ class ReceiptState extends State<Receipt> {
     int addFeeds = 0,
     bool useImageRaster = false,
   }) async {
-    int quality = 4;
+    int quality = 2;
     final RenderRepaintBoundary boundary =
         _localKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: quality.toDouble());
     final byteData = await image.toByteData(format: ImageByteFormat.rawRgba);
     final bytes = byteData!.buffer.asUint8List();
 
-    final im = img.Image.fromBytes(image.width, image.height, bytes);
-
     await FlutterBluetoothPrinter.printImage(
       address: address,
-      image: im,
+      imageBytes: bytes,
+      imageWidth: image.width,
+      imageHeight: image.height,
       paperSize: _paperSize,
       onProgress: onProgress,
       addFeeds: addFeeds,
