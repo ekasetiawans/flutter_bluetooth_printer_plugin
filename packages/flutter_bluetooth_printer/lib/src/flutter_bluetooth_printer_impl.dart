@@ -58,7 +58,8 @@ class FlutterBluetoothPrinter {
       srcHeight: imageHeight,
     );
 
-    final src = img.decodeJpg(bytes)!;
+    img.Image src = img.decodeJpg(bytes)!;
+
     final profile = await CapabilityProfile.load();
     final generator = Generator(
       paperSize,
@@ -124,6 +125,7 @@ class FlutterBluetoothPrinter {
     final w = src.width;
     final h = src.height;
 
+    src = img.smooth(src, 1.5);
     final res = img.Image(w, h);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
@@ -147,20 +149,23 @@ class FlutterBluetoothPrinter {
       }
     }
 
-    final image = img.pixelate(res, 2, mode: img.PixelateMode.average);
-    final dotsPerLine = paperSize.width;
+    src = res;
+    src = img.pixelate(
+      src,
+      (src.width / paperSize.width).round(),
+      mode: img.PixelateMode.average,
+    );
 
+    final dotsPerLine = paperSize.width;
     // make sure image not bigger than printable area
-    if (image.width > dotsPerLine) {
-      double ratio = dotsPerLine / image.width;
-      int height = (image.height * ratio).ceil();
+    if (src.width > dotsPerLine) {
+      double ratio = dotsPerLine / src.width;
+      int height = (src.height * ratio).ceil();
       src = img.copyResize(
-        image,
+        src,
         width: dotsPerLine,
         height: height,
       );
-    } else {
-      src = image;
     }
 
     return img.encodeJpg(src);
