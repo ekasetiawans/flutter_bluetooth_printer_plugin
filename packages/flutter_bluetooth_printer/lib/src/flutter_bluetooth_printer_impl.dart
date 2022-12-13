@@ -47,6 +47,7 @@ class FlutterBluetoothPrinter {
     PaperSize paperSize = PaperSize.mm58,
     ProgressCallback? onProgress,
     int addFeeds = 0,
+    bool useImageRaster = false,
   }) async {
     img.Image src;
     image = img.pixelate(
@@ -78,13 +79,31 @@ class FlutterBluetoothPrinter {
       profile,
       spaceBetweenRows: 0,
     );
-    final data = generator.image(src);
+    List<int> imageData;
+    if (useImageRaster) {
+      imageData = generator.imageRaster(
+        src,
+        highDensityHorizontal: true,
+        highDensityVertical: true,
+        imageFn: PosImageFn.bitImageRaster,
+      );
+    } else {
+      imageData = generator.image(src);
+    }
 
-    final additional = generator.emptyLines(addFeeds);
+    final additional = [
+      ...generator.emptyLines(addFeeds),
+      ...generator.text('.'),
+    ];
 
     return printBytes(
       address: address,
-      data: Uint8List.fromList([...generator.reset(), ...data, ...additional]),
+      data: Uint8List.fromList([
+        ...generator.reset(),
+        ...imageData,
+        ...generator.reset(),
+        ...additional,
+      ]),
       onProgress: onProgress,
     );
   }

@@ -246,6 +246,7 @@ class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
         .print(
       address: widget.device,
       linesAfter: 2,
+      useImageRaster: true,
       onProgress: (total, sent) {
         if (mounted) {
           setState(() {
