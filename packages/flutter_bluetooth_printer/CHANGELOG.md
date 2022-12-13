@@ -1,3 +1,8 @@
+## 2.6.1
+
+ - **PERF**: improve receipt.
+ - **PERF**: optimizing recipt in a background isolate.
+
 ## 2.6.0
 
  - **FEAT**: determine chunkSize dynamically.
