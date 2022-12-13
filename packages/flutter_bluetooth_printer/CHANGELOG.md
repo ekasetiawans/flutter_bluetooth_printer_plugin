@@ -1,3 +1,8 @@
+## 2.4.0
+
+ - **FEAT**: reimplements ios native platform.
+ - **FEAT**: improve receipt widget.
+
 ## 2.3.0
 
  - **FEAT**: imrpove state ios.
