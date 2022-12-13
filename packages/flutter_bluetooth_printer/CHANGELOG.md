@@ -1,3 +1,7 @@
+## 2.6.0
+
+ - **FEAT**: determine chunkSize dynamically.
+
 ## 2.5.0
 
  - **FEAT**: added option to useImageRaster while print.
