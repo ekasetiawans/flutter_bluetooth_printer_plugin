@@ -1,3 +1,7 @@
+## 2.6.2
+
+ - **DOCS**: updated README.md.
+
 ## 2.6.1
 
  - **PERF**: improve receipt.
