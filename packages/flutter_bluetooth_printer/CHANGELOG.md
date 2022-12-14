@@ -1,3 +1,7 @@
+## 2.6.3
+
+ - **DOCS**: fix typo.
+
 ## 2.6.2
 
  - **DOCS**: updated README.md.
