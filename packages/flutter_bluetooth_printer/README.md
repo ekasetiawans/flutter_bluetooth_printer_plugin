@@ -103,4 +103,4 @@ FlutterBluetoothPrinter.printBytes(...);
 
 ## Discord
 
-Click [here](https://discord.gg/aqk6JjBm) to my join to discord channels
+Click [here](https://discord.gg/aqk6JjBm) to join to my discord channels
