@@ -66,13 +66,13 @@ public protocol PrinterManagerDelegate: NSObjectProtocol {
 
 public extension BluetoothPrinterManager {
 
-    static var specifiedServices: Set<String> = ["E7810A71-73AE-499D-8C15-FAA9AEF0C3F2"]
+    static var specifiedServices: Set<String> = ["18F0"]
     static var specifiedCharacteristics: Set<String>?
 }
 
 public class BluetoothPrinterManager {
 
-    private let queue = DispatchQueue(label: "com.kevin.gong.printer")
+    private let queue = DispatchQueue(label: "maseka.dev/flutter_bluetooth_printer")
 
     private let centralManager: CBCentralManager
 
@@ -286,35 +286,33 @@ public class BluetoothPrinterManager {
     }
 
     public func print(_ content: ESCPOSCommandsCreator, encoding: String.Encoding = String.GBEncoding.GB_18030_2000, progressBlock: ((Int, Int) -> ())? = nil, completeBlock: ((PError?) -> ())? = nil) {
-            guard let p = self.peripheralDelegate.writablePeripheral, let c = self.peripheralDelegate.writablecharacteristic else {
+            guard let peripheral = self.peripheralDelegate.writablePeripheral, let characteristic = self.peripheralDelegate.writablecharacteristic else {
 
                 completeBlock?(.deviceNotReady)
                 return
             }
         
             
-            
             let contentData = content.data(using: encoding)[0]
             let total = contentData.endIndex
-            if (p.canSendWriteWithoutResponse){
-                let chunkSize = p.maximumWriteValueLength(for: .withoutResponse)
-                let task = PrintingTask(source: contentData, peripheral: p, characteristic: c, size: chunkSize, type: .withoutResponse)
+            let sendWithoutResponse = characteristic.properties.contains(.writeWithoutResponse)
+        
+            if (peripheral.canSendWriteWithoutResponse && sendWithoutResponse){
+                let chunkSize = peripheral.maximumWriteValueLength(for: .withoutResponse)
+                let task = PrintingTask(source: contentData, peripheral: peripheral, characteristic: characteristic, size: chunkSize, type: .withoutResponse)
                 var offset = 0
                 progressBlock?(0, total)
                 
                 self.peripheralDelegate.didWriteData = { (peripheral, error) in
                     if error != nil {
-                        if (p.canSendWriteWithoutResponse){
-                            // print previous chunk because it was error
-                            offset -= chunkSize
-                            offset = task.printNext(offset: offset)
-                        }
+                        offset -= chunkSize
+                        offset = task.printNext(offset: offset)
                         return
                     }
                     
                     progressBlock?(offset, total)
                     if (offset < total){
-                        if (p.canSendWriteWithoutResponse){
+                        if (peripheral.canSendWriteWithoutResponse){
                             offset = task.printNext(offset: offset)
                         }
                         return
@@ -331,9 +329,9 @@ public class BluetoothPrinterManager {
                 offset = task.printNext(offset: offset)
                 
             } else {
-                let chunkSize = p.maximumWriteValueLength(for: .withResponse)
+                let chunkSize = peripheral.maximumWriteValueLength(for: .withResponse)
                 
-                let task = PrintingTask(source: contentData, peripheral: p, characteristic: c, size: chunkSize, type: .withResponse)
+                let task = PrintingTask(source: contentData, peripheral: peripheral, characteristic: characteristic, size: chunkSize, type: .withResponse)
                 var offset = 0
                 
                 self.peripheralDelegate.didWriteData = { (peripheral, error) in

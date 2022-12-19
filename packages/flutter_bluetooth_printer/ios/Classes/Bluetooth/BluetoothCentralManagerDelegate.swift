@@ -106,8 +106,8 @@ class BluetoothCentralManagerDelegate: NSObject, CBCentralManagerDelegate {
         peripheral.discoverServices(services.map { CBUUID(string: $0) })
 
         // 保存已连接的uuid
-        UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: UserDefaultKey.autoConectUUID)
-        UserDefaults.standard.synchronize()
+        //UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: UserDefaultKey.autoConectUUID)
+        //UserDefaults.standard.synchronize()
     }
 
     public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
