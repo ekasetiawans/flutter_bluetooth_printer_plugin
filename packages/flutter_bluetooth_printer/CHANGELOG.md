@@ -1,3 +1,7 @@
+## 2.7.1
+
+ - **FIX**: updated UUID.
+
 ## 2.7.0
 
  - **FEAT**: added support keepConnected.
