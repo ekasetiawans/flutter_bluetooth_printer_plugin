@@ -41,6 +41,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     private Activity activity;
     private BluetoothAdapter bluetoothAdapter;
     private FlutterPluginBinding flutterPluginBinding;
+    private Map<String, BluetoothSocket> connectedDevices = new HashMap<>();
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -206,6 +207,29 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 return;
             }
 
+            case "disconnect": {
+                AsyncTask.execute(() -> {
+                    synchronized (FlutterBluetoothPrinterPlugin.this) {
+                        try {
+                            String address = call.argument("address");
+                            BluetoothSocket socket = connectedDevices.remove(address);
+                            if (socket != null){
+                                socket.close();
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    // DONE
+                                    result.success(true);
+                                });
+                            }
+                        } catch (Exception e) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                result.error("error", e.getMessage(), null);
+                            });
+                        }
+                    }
+                });
+                return;
+            }
+
             case "write": {
                 // CONNECTING
                 channel.invokeMethod("didUpdateState", 1);
@@ -214,6 +238,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                     synchronized (FlutterBluetoothPrinterPlugin.this) {
                         try {
                             String address = call.argument("address");
+                            boolean keepConnected = call.argument("keep_connected");
                             byte[] data = call.argument("data");
 
                             final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
@@ -221,6 +246,10 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                             BluetoothSocket bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
                             bluetoothSocket.connect();
                             try {
+                                if (keepConnected){
+                                    connectedDevices.put(address, bluetoothSocket);
+                                }
+
                                 OutputStream writeStream = bluetoothSocket.getOutputStream();
 
                                 // PRINTING
@@ -244,7 +273,9 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                     result.success(true);
                                 });
                             } finally {
-                                bluetoothSocket.close();
+                                if (!keepConnected) {
+                                    bluetoothSocket.close();
+                                }
                             }
                         } catch (Exception e) {
                             new Handler(Looper.getMainLooper()).post(() -> {

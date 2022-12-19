@@ -32,12 +32,16 @@ class FlutterBluetoothPrinter {
   static Future<void> printBytes({
     required String address,
     required Uint8List data,
+
+    /// if true, you should manually disconnect the printer after finished
+    required bool keepConnected,
     ProgressCallback? onProgress,
   }) async {
     await FlutterBluetoothPrinterPlatform.instance.write(
       address: address,
       data: data,
       onProgress: onProgress,
+      keepConnected: keepConnected,
     );
   }
 
@@ -50,6 +54,7 @@ class FlutterBluetoothPrinter {
     ProgressCallback? onProgress,
     int addFeeds = 0,
     bool useImageRaster = false,
+    required bool keepConnected,
   }) async {
     final bytes = await _optimizeImage(
       paperSize: paperSize,
@@ -84,6 +89,7 @@ class FlutterBluetoothPrinter {
     ];
 
     return printBytes(
+      keepConnected: keepConnected,
       address: address,
       data: Uint8List.fromList([
         ...generator.reset(),
@@ -180,5 +186,9 @@ class FlutterBluetoothPrinter {
       return selected;
     }
     return null;
+  }
+
+  static Future<bool> disconnect(String address) async {
+    return FlutterBluetoothPrinterPlatform.instance.disconnect(address);
   }
 }

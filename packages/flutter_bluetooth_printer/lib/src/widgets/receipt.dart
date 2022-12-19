@@ -35,12 +35,14 @@ class ReceiptController with ChangeNotifier {
     /// add lines after print
     int linesAfter = 0,
     bool useImageRaster = false,
+    bool keepConnected = false,
   }) {
     return _state.print(
       address: address,
       onProgress: onProgress,
       addFeeds: linesAfter,
       useImageRaster: useImageRaster,
+      keepConnected: keepConnected,
     );
   }
 }
@@ -146,6 +148,7 @@ class ReceiptState extends State<Receipt> {
     ProgressCallback? onProgress,
     int addFeeds = 0,
     bool useImageRaster = false,
+    bool keepConnected = false,
   }) async {
     int quality = 4;
     final RenderRepaintBoundary boundary =
@@ -163,6 +166,7 @@ class ReceiptState extends State<Receipt> {
       onProgress: onProgress,
       addFeeds: addFeeds,
       useImageRaster: useImageRaster,
+      keepConnected: keepConnected,
     );
   }
 }

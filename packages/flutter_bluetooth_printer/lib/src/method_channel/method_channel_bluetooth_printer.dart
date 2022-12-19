@@ -110,6 +110,7 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
   Future<void> write({
     required String address,
     required Uint8List data,
+    bool keepConnected = false,
     ProgressCallback? onProgress,
   }) async {
     try {
@@ -131,11 +132,25 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
       await channel.invokeMethod('write', {
         'address': address,
         'data': data,
+        'keep_connected': keepConnected,
       });
 
       _progressCallback = null;
     } finally {
       _isBusy = false;
     }
+  }
+
+  @override
+  Future<bool> disconnect(String address) async {
+    final res = await channel.invokeMethod('disconnect', {
+      'address': address,
+    });
+
+    if (res is bool) {
+      return res;
+    }
+
+    return false;
   }
 }

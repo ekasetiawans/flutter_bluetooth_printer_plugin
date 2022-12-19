@@ -243,11 +243,11 @@ class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
   @override
   void initState() {
     super.initState();
-    widget.controller
-        .print(
+    widget.controller.print(
       address: widget.device,
       linesAfter: 2,
       useImageRaster: true,
+      keepConnected: true,
       onProgress: (total, sent) {
         if (mounted) {
           setState(() {
@@ -255,12 +255,7 @@ class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
           });
         }
       },
-    )
-        .then((value) {
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    });
+    );
   }
 
   @override
@@ -284,7 +279,17 @@ class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
               backgroundColor: Colors.grey.shade200,
             ),
             const SizedBox(height: 4),
-            Text('Processing: ${((progress ?? 0) * 100).round()}%')
+            Text('Processing: ${((progress ?? 0) * 100).round()}%'),
+            if (((progress ?? 0) * 100).round() == 100) ...[
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  await FlutterBluetoothPrinter.disconnect(widget.device);
+                  Navigator.pop(context);
+                },
+                child: const Text('Disconnect'),
+              )
+            ]
           ],
         ),
       ),

@@ -58,8 +58,24 @@ class BluetoothPeripheralDelegate: NSObject, CBPeripheralDelegate {
         writablecharacteristic = service.characteristics?.filter { $0.uuid.uuidString == writablecharacteristicUUID }.first
     }
     
+    var lastWriteError: Error?
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        if (error != nil){
+            print(error!)
+            lastWriteError = error
+            return
+        }
         didWriteData?(peripheral, error)
+    }
+    
+    func peripheralIsReady(toSendWriteWithoutResponse peripheral: CBPeripheral) {
+        let error = lastWriteError
+        lastWriteError = nil
+        didWriteData?(peripheral, error)
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        
     }
 }
 

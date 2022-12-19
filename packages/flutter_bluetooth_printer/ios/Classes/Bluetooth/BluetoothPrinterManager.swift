@@ -216,6 +216,11 @@ public class BluetoothPrinterManager {
     var didConnected: DidConnected?
     public func connect(_ printer: BluetoothPrinter, didConnected: @escaping DidConnected) {
         self.didConnected = didConnected
+        if (printer.state == .connected){
+            didConnected()
+            return
+        }
+        
         guard let per = centralManagerDelegate[printer.identifier] else {
 
             return
@@ -286,33 +291,74 @@ public class BluetoothPrinterManager {
                 completeBlock?(.deviceNotReady)
                 return
             }
+        
+            
             
             let contentData = content.data(using: encoding)[0]
             let total = contentData.endIndex
-            let chunkSize = p.maximumWriteValueLength(for: .withResponse)
-            
-            let task = PrintingTask(source: contentData, peripheral: p, characteristic: c, size: chunkSize)
-            var offset = 0
-            
-            self.peripheralDelegate.didWriteData = { (peripheral, error) in
-                if error != nil {
-                    completeBlock?(.connectFailed)
-                    return
+            if (p.canSendWriteWithoutResponse){
+                let chunkSize = p.maximumWriteValueLength(for: .withoutResponse)
+                let task = PrintingTask(source: contentData, peripheral: p, characteristic: c, size: chunkSize, type: .withoutResponse)
+                var offset = 0
+                progressBlock?(0, total)
+                
+                self.peripheralDelegate.didWriteData = { (peripheral, error) in
+                    if error != nil {
+                        if (p.canSendWriteWithoutResponse){
+                            // print previous chunk because it was error
+                            offset -= chunkSize
+                            offset = task.printNext(offset: offset)
+                        }
+                        return
+                    }
+                    
+                    progressBlock?(offset, total)
+                    if (offset < total){
+                        if (p.canSendWriteWithoutResponse){
+                            offset = task.printNext(offset: offset)
+                        }
+                        return
+                    }
+                    
+                    // Wait for 3 seconds to disconnect the printer automatically
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        completeBlock?(nil)
+                        self.peripheralDelegate.didWriteData = nil
+                    }
                 }
                 
-                progressBlock?(offset, total)
-                if (offset < total){
-                    offset = task.printNext(offset: offset)
-                    return
+                progressBlock?(0, total)
+                offset = task.printNext(offset: offset)
+                
+            } else {
+                let chunkSize = p.maximumWriteValueLength(for: .withResponse)
+                
+                let task = PrintingTask(source: contentData, peripheral: p, characteristic: c, size: chunkSize, type: .withResponse)
+                var offset = 0
+                
+                self.peripheralDelegate.didWriteData = { (peripheral, error) in
+                    if error != nil {
+                        completeBlock?(.connectFailed)
+                        return
+                    }
+                    
+                    progressBlock?(offset, total)
+                    if (offset < total){
+                        offset = task.printNext(offset: offset)
+                        return
+                    }
+                    
+                    // Wait for 3 seconds to disconnect the printer automatically
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        completeBlock?(nil)
+                        self.peripheralDelegate.didWriteData = nil
+                    }
                 }
                 
-                completeBlock?(nil)
-                self.peripheralDelegate.didWriteData = nil
+                
+                progressBlock?(0, total)
+                offset = task.printNext(offset: offset)
             }
-            
-            
-            progressBlock?(0, total)
-            offset = task.printNext(offset: offset)
         
     }
 
@@ -331,13 +377,15 @@ private struct PrintingTask {
     let peripheral: CBPeripheral
     let characteristic: CBCharacteristic
     let max:Int
+    let type: CBCharacteristicWriteType
     
-    public init(source: Data, peripheral: CBPeripheral, characteristic: CBCharacteristic, size: Int){
+    public init(source: Data, peripheral: CBPeripheral, characteristic: CBCharacteristic, size: Int, type: CBCharacteristicWriteType){
         self.peripheral = peripheral
         self.characteristic = characteristic
         self.source = source
         self.totalLength = source.endIndex
         self.max = size
+        self.type = type
     }
     
     public func printNext(offset: Int) -> Int {
@@ -346,8 +394,9 @@ private struct PrintingTask {
         let chunkSize = offset + max > totalLength ? totalLength - offset : max
         
         let chunk = source.subdata(in: offset..<offset + chunkSize)
-        self.peripheral.writeValue(chunk, for: self.characteristic, type: .withResponse)
-                
+        
+        self.peripheral.writeValue(chunk, for: self.characteristic, type: self.type)
+        
         
         off += chunkSize
         return off

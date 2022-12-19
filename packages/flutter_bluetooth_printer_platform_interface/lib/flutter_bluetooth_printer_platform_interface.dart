@@ -44,8 +44,11 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
   Future<void> write({
     required String address,
     required Uint8List data,
+    bool keepConnected = false,
     ProgressCallback? onProgress,
   });
+
+  Future<bool> disconnect(String address);
 }
 
 class BluetoothDevice extends DiscoveryState {
