@@ -1,3 +1,7 @@
+## 0.0.4
+
+ - **FEAT**: added support keepConnected.
+
 ## 0.0.3
 
  - **FEAT**: improve state (android).

@@ -1,3 +1,7 @@
+## 2.7.0
+
+ - **FEAT**: added support keepConnected.
+
 ## 2.6.3
 
  - **DOCS**: fix typo.
