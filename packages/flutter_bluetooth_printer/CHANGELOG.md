@@ -1,3 +1,7 @@
+## 2.8.0
+
+ - **FEAT**: updated image dependency version constraint.
+
 ## 2.7.1
 
  - **FIX**: updated UUID.
