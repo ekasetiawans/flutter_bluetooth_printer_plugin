@@ -4,8 +4,6 @@ extension PaperSizeName on PaperSize {
   String get name {
     if (this == PaperSize.mm58) {
       return '58mm';
-    } else if (this == PaperSize.mm72) {
-      return '72mm';
     } else if (this == PaperSize.mm80) {
       return '80mm';
     }
