@@ -121,14 +121,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  esc_pos_utils_plus:
+  esc_pos_utils:
     dependency: transitive
     description:
-      name: esc_pos_utils_plus
-      sha256: "397c8c6eda37e3ee50aa22a591fe87c5ca8e0fa50ea0f092fcd42dbdfa8c2863"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1+6"
+      path: "."
+      ref: HEAD
+      resolved-ref: bb31860d21e865718fe7760e13db4aacacf18e59
+      url: "https://github.com/RamshaFarheen/esc_pos_utils.git"
+    source: git
+    version: "1.1.0"
   extension:
     dependency: transitive
     description:
@@ -199,6 +200,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  gbk_codec:
+    dependency: transitive
+    description:
+      name: gbk_codec
+      sha256: "3af5311fc9393115e3650ae6023862adf998051a804a08fb804f042724999f61"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   hex:
     dependency: transitive
     description:
