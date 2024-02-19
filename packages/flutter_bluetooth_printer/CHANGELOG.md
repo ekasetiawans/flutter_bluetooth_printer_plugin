@@ -1,3 +1,7 @@
+## 2.8.1
+
+ - **FIX**: update dependencies.
+
 ## 2.8.0
 
  - **FEAT**: updated image dependency version constraint.

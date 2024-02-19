@@ -1,3 +1,7 @@
+## 0.0.4+1
+
+ - **FIX**: update dependencies.
+
 ## 0.0.4
 
  - **FEAT**: added support keepConnected.
