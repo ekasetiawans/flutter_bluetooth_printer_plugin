@@ -107,10 +107,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
                       ],
                     ),
                     const Divider(thickness: 2),
-                    FittedBox(
+                    const FittedBox(
                       fit: BoxFit.cover,
                       child: Row(
-                        children: const [
+                        children: [
                           Text(
                             'TOTAL',
                             style: TextStyle(

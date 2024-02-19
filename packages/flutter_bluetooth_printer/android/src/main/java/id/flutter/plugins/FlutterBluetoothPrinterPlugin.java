@@ -79,7 +79,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                     for (EventChannel.EventSink sink : sinkList.values()) {
                         sink.success(data);
                     }
-                } else if (value == BluetoothAdapter.STATE_ON){
+                } else if (value == BluetoothAdapter.STATE_ON) {
                     startDiscovery(false);
                 }
             }
@@ -113,15 +113,15 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     private boolean ensurePermission(boolean request) {
         if (SDK_INT >= Build.VERSION_CODES.M) {
             if (SDK_INT >= 31) {
-                 final boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
-                 final boolean bluetoothScan = activity.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
-                 final boolean bluetoothConnect = activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+                final boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
+                final boolean bluetoothScan = activity.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
+                final boolean bluetoothConnect = activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
 
-                 if ( bluetooth && bluetoothScan && bluetoothConnect){
-                     return true;
-                 }
+                if (bluetooth && bluetoothScan && bluetoothConnect) {
+                    return true;
+                }
 
-                 if (!request) return false;
+                if (!request) return false;
                 activity.requestPermissions(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, 919191);
             } else {
                 boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
@@ -184,23 +184,23 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         final String method = call.method;
         switch (method) {
             case "getState": {
-                if (!ensurePermission(false)){
+                if (!ensurePermission(false)) {
                     result.success(3);
                     return;
                 }
 
-                if (!bluetoothAdapter.isEnabled()){
+                if (!bluetoothAdapter.isEnabled()) {
                     result.success(1);
                     return;
                 }
 
                 final int state = bluetoothAdapter.getState();
-                if (state == BluetoothAdapter.STATE_OFF){
+                if (state == BluetoothAdapter.STATE_OFF) {
                     result.success(1);
                     return;
                 }
 
-                if (state == BluetoothAdapter.STATE_ON){
+                if (state == BluetoothAdapter.STATE_ON) {
                     result.success(2);
                     return;
                 }
@@ -213,7 +213,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                         try {
                             String address = call.argument("address");
                             BluetoothSocket socket = connectedDevices.remove(address);
-                            if (socket != null){
+                            if (socket != null) {
                                 socket.close();
                                 new Handler(Looper.getMainLooper()).post(() -> {
                                     // DONE
@@ -246,15 +246,17 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                             BluetoothSocket bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
                             bluetoothSocket.connect();
                             try {
-                                if (keepConnected){
+                                if (keepConnected) {
                                     connectedDevices.put(address, bluetoothSocket);
                                 }
+
 
                                 OutputStream writeStream = bluetoothSocket.getOutputStream();
 
                                 // PRINTING
                                 new Handler(Looper.getMainLooper()).post(() -> channel.invokeMethod("didUpdateState", 2));
                                 updatePrintingProgress(data.length, 0);
+
 
                                 writeStream.write(data);
                                 writeStream.flush();
@@ -337,7 +339,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 }
             }
 
-            if (!bluetoothAdapter.isEnabled()){
+            if (!bluetoothAdapter.isEnabled()) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("code", 1);
 
@@ -348,7 +350,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
             }
 
             final int state = bluetoothAdapter.getState();
-            if (state == BluetoothAdapter.STATE_OFF){
+            if (state == BluetoothAdapter.STATE_OFF) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("code", 1);
 

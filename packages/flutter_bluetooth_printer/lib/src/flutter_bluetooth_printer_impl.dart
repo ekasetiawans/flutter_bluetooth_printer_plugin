@@ -63,7 +63,7 @@ class FlutterBluetoothPrinter {
       srcHeight: imageHeight,
     );
 
-    img.Image src = img.decodeJpg(bytes)!;
+    img.Image src = img.decodeJpg(Uint8List.fromList(bytes))!;
 
     final profile = await CapabilityProfile.load();
     final generator = Generator(
@@ -127,38 +127,40 @@ class FlutterBluetoothPrinter {
     final height = arg['height'] as int;
     final paperSize = arg['paperSize'] as PaperSize;
 
-    img.Image src = img.Image.fromBytes(width, height, srcBytes);
+    final bytes = Uint8List.fromList(srcBytes);
+    img.Image src = img.Image.fromBytes(
+      width: width,
+      height: height,
+      bytes: bytes.buffer,
+    );
     final w = src.width;
     final h = src.height;
 
-    src = img.smooth(src, 1.5);
-    final res = img.Image(w, h);
+    src = img.smooth(src, weight: 1.5);
+    final res = img.Image(width: w, height: h);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
-        final idx = y * w + x;
+        final pixel = src.getPixel(x, y);
+        final r = pixel.r;
+        final b = pixel.b;
+        final g = pixel.g;
 
-        final pixel = src[idx];
-        final r = img.getRed(pixel);
-        final b = img.getBlue(pixel);
-        final g = img.getGreen(pixel);
-
-        int c;
+        img.Color c;
         final l = img.getLuminanceRgb(r, g, b) / 255;
         if (l > 0.8) {
-          c = img.getColor(255, 255, 255);
+          c = src.getColor(255, 255, 255);
         } else {
-          c = img.getColor(0, 0, 0);
+          c = src.getColor(0, 0, 0);
         }
 
-        final u = BigInt.from(c).toUnsigned(32);
-        res[idx] = u.toInt();
+        res.setPixel(x, y, c);
       }
     }
 
     src = res;
     src = img.pixelate(
       src,
-      (src.width / paperSize.width).round(),
+      size: (src.width / paperSize.width).round(),
       mode: img.PixelateMode.average,
     );
 
