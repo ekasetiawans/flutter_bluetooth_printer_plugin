@@ -1,3 +1,7 @@
+## 2.8.2
+
+ - **FIX**: receipt print.
+
 ## 2.8.1
 
  - **FIX**: update dependencies.
