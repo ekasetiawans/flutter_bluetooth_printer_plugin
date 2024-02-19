@@ -151,37 +151,37 @@ class _ReceiptPageState extends State<ReceiptPage> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: PopupMenuButton<PaperSize>(
-                      initialValue: controller?.paperSize,
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          child: Text('58mm'),
-                          value: PaperSize.mm58,
-                        ),
-                        const PopupMenuItem(
-                          child: Text('72mm'),
-                          value: PaperSize.mm72,
-                        ),
-                        const PopupMenuItem(
-                          child: Text('80mm'),
-                          value: PaperSize.mm80,
-                        ),
-                      ],
-                      onSelected: (value) {
-                        setState(() {
-                          controller?.paperSize = value;
-                        });
-                      },
-                      child: Text(controller?.paperSize.name ?? ''),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
+                  // Container(
+                  //   padding: const EdgeInsets.all(12.0),
+                  //   decoration: BoxDecoration(
+                  //     border: Border.all(),
+                  //     borderRadius: BorderRadius.circular(100),
+                  //   ),
+                  //   child: PopupMenuButton<PaperSize>(
+                  //     initialValue: controller?.paperSize,
+                  //     itemBuilder: (context) => [
+                  //       const PopupMenuItem(
+                  //         child: Text('58mm'),
+                  //         value: PaperSize.mm58,
+                  //       ),
+                  //       const PopupMenuItem(
+                  //         child: Text('72mm'),
+                  //         value: PaperSize.mm72,
+                  //       ),
+                  //       const PopupMenuItem(
+                  //         child: Text('80mm'),
+                  //         value: PaperSize.mm80,
+                  //       ),
+                  //     ],
+                  //     onSelected: (value) {
+                  //       setState(() {
+                  //         controller?.paperSize = value;
+                  //       });
+                  //     },
+                  //     child: Text(controller?.paperSize.name ?? ''),
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {

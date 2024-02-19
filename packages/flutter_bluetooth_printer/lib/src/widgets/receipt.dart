@@ -119,14 +119,13 @@ class ReceiptState extends State<Receipt> {
                     child: Container(
                       color: Colors.white,
                       child: DefaultTextStyle.merge(
-                        style: widget.defaultTextStyle ??
-                            const TextStyle(
-                              fontSize: 24,
-                              height: 1.1,
-                              color: Colors.black,
-                              fontFamily: 'HermeneusOne',
-                              package: 'flutter_bluetooth_printer',
-                            ),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          height: 1.1,
+                          color: Colors.black,
+                          fontFamily: 'HermeneusOne',
+                          package: 'flutter_bluetooth_printer',
+                        ).merge(widget.defaultTextStyle),
                         child: SizedBox(
                           width: _paperSize.width.toDouble(),
                           child: Builder(builder: widget.builder),
@@ -154,7 +153,7 @@ class ReceiptState extends State<Receipt> {
     final RenderRepaintBoundary boundary =
         _localKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: quality.toDouble());
-    final byteData = await image.toByteData(format: ImageByteFormat.rawRgba);
+    final byteData = await image.toByteData(format: ImageByteFormat.png);
     final bytes = byteData!.buffer.asUint8List();
 
     await FlutterBluetoothPrinter.printImage(

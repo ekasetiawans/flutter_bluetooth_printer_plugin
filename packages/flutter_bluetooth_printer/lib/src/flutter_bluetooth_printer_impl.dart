@@ -78,6 +78,7 @@ class FlutterBluetoothPrinter {
         highDensityHorizontal: true,
         highDensityVertical: true,
         imageFn: PosImageFn.bitImageRaster,
+        align: PosAlign.left,
       );
     } else {
       imageData = generator.image(src);
@@ -85,7 +86,6 @@ class FlutterBluetoothPrinter {
 
     final additional = [
       ...generator.emptyLines(addFeeds),
-      ...generator.text('.'),
     ];
 
     return printBytes(
@@ -123,34 +123,25 @@ class FlutterBluetoothPrinter {
 
   static Future<List<int>> _blackwhiteInternal(Map<String, dynamic> arg) async {
     final srcBytes = arg['src'] as List<int>;
-    final width = arg['width'] as int;
-    final height = arg['height'] as int;
     final paperSize = arg['paperSize'] as PaperSize;
 
     final bytes = Uint8List.fromList(srcBytes);
-    img.Image src = img.Image.fromBytes(
-      width: width,
-      height: height,
-      bytes: bytes.buffer,
-    );
+    img.Image src = img.decodePng(bytes)!;
+
     final w = src.width;
     final h = src.height;
 
-    src = img.smooth(src, weight: 1.5);
     final res = img.Image(width: w, height: h);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         final pixel = src.getPixel(x, y);
-        final r = pixel.r;
-        final b = pixel.b;
-        final g = pixel.g;
 
         img.Color c;
-        final l = img.getLuminanceRgb(r, g, b) / 255;
+        final l = pixel.luminance / 255;
         if (l > 0.8) {
-          c = src.getColor(255, 255, 255);
+          c = img.ColorUint8.rgb(255, 255, 255);
         } else {
-          c = src.getColor(0, 0, 0);
+          c = img.ColorUint8.rgb(0, 0, 0);
         }
 
         res.setPixel(x, y, c);
@@ -158,23 +149,12 @@ class FlutterBluetoothPrinter {
     }
 
     src = res;
-    src = img.pixelate(
-      src,
-      size: (src.width / paperSize.width).round(),
-      mode: img.PixelateMode.average,
-    );
-
     final dotsPerLine = paperSize.width;
-    // make sure image not bigger than printable area
-    if (src.width > dotsPerLine) {
-      double ratio = dotsPerLine / src.width;
-      int height = (src.height * ratio).ceil();
-      src = img.copyResize(
-        src,
-        width: dotsPerLine,
-        height: height,
-      );
-    }
+    src = img.copyResize(
+      src,
+      width: dotsPerLine,
+      maintainAspect: true,
+    );
 
     return img.encodeJpg(src);
   }
