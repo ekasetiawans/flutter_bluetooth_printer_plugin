@@ -257,12 +257,21 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                 new Handler(Looper.getMainLooper()).post(() -> channel.invokeMethod("didUpdateState", 2));
                                 updatePrintingProgress(data.length, 0);
 
+                                int tmpOffset = 0;
+                                int bytesToWrite = data.length;
+                                int mMaxTxPacketSize = 512;
+                                while (bytesToWrite > 0) {
+                                    int tmpLength = Math.min(bytesToWrite, mMaxTxPacketSize);
+                                    writeStream.write(data, tmpOffset, tmpLength);
+                                    writeStream.flush();
+                                    tmpOffset += tmpLength;
+                                    updatePrintingProgress(data.length, tmpOffset);
+                                    bytesToWrite -= tmpLength;
+                                    Thread.sleep(300);
+                                }
 
-                                writeStream.write(data);
-                                writeStream.flush();
 
                                 updatePrintingProgress(data.length, data.length);
-
                                 // waiting for printing completed
                                 Thread.sleep(3000);
                                 writeStream.close();
