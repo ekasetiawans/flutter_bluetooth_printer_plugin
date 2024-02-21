@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-02-22
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.9.0`](#flutter_bluetooth_printer---v290)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.9.0`
+
+ - **FEAT**: [android] split payload into chunks.
+
+
 ## 2024-02-20
 
 ### Changes

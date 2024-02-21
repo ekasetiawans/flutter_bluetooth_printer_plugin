@@ -1,3 +1,7 @@
+## 2.9.0
+
+ - **FEAT**: [android] split payload into chunks.
+
 ## 2.8.2
 
  - **FIX**: receipt print.
