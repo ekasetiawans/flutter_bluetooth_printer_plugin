@@ -1,3 +1,7 @@
+## 2.9.1
+
+ - **FIX**: improve print speed android.
+
 ## 2.9.0
 
  - **FEAT**: [android] split payload into chunks.
