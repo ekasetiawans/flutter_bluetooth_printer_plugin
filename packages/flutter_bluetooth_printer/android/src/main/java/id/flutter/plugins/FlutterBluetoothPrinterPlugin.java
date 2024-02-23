@@ -267,7 +267,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                     tmpOffset += tmpLength;
                                     updatePrintingProgress(data.length, tmpOffset);
                                     bytesToWrite -= tmpLength;
-                                    Thread.sleep(300);
+                                    Thread.sleep(60);
                                 }
 
 
