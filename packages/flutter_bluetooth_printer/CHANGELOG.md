@@ -1,3 +1,7 @@
+## 2.10.0
+
+ - **FEAT**: remove esc_pos_utils dependencies.
+
 ## 2.9.1
 
  - **FIX**: improve print speed android.

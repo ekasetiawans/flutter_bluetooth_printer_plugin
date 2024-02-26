@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-02-26
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.10.0`](#flutter_bluetooth_printer---v2100)
+ - [`flutter_bluetooth_printer_platform_interface` - `v0.0.5`](#flutter_bluetooth_printer_platform_interface---v005)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.10.0`
+
+ - **FEAT**: remove esc_pos_utils dependencies.
+
+#### `flutter_bluetooth_printer_platform_interface` - `v0.0.5`
+
+ - **FEAT**: remove esc_pos_utils dependencies.
+
+
 ## 2024-02-23
 
 ### Changes

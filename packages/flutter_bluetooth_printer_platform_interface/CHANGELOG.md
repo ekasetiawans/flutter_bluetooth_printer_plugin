@@ -1,3 +1,7 @@
+## 0.0.5
+
+ - **FEAT**: remove esc_pos_utils dependencies.
+
 ## 0.0.4+1
 
  - **FIX**: update dependencies.
