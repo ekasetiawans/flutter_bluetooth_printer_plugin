@@ -5,6 +5,17 @@ class DiscoveryResult extends DiscoveryState {
   DiscoveryResult({required this.devices});
 }
 
+enum PaperSize {
+  mm58(384, 'Roll Paper 58mm');
+
+  final int width;
+  final String name;
+  const PaperSize(
+    this.width,
+    this.name,
+  );
+}
+
 class FlutterBluetoothPrinter {
   static void registerWith() {
     FlutterBluetoothPrinterPlatform.instance = _MethodChannelBluetoothPrinter();
@@ -35,6 +46,8 @@ class FlutterBluetoothPrinter {
 
     /// if true, you should manually disconnect the printer after finished
     required bool keepConnected,
+    int maxBufferSize = 512,
+    int delayTime = 120,
     ProgressCallback? onProgress,
   }) async {
     await FlutterBluetoothPrinterPlatform.instance.write(
@@ -42,12 +55,14 @@ class FlutterBluetoothPrinter {
       data: data,
       onProgress: onProgress,
       keepConnected: keepConnected,
+      maxBufferSize: maxBufferSize,
+      delayTime: delayTime,
     );
   }
 
   static Future<void> printImage({
     required String address,
-    required List<int> imageBytes,
+    required Uint8List imageBytes,
     required int imageWidth,
     required int imageHeight,
     PaperSize paperSize = PaperSize.mm58,
@@ -55,108 +70,32 @@ class FlutterBluetoothPrinter {
     int addFeeds = 0,
     bool useImageRaster = false,
     required bool keepConnected,
+    int maxBufferSize = 512,
+    int delayTime = 120,
   }) async {
-    final bytes = await _optimizeImage(
-      paperSize: paperSize,
-      src: imageBytes,
-      srcWidth: imageWidth,
-      srcHeight: imageHeight,
+    final reset = '\x1B\x40'.codeUnits;
+    final imageData = await ImageUtils.encode(
+      bytes: imageBytes,
+      dotsPerLine: paperSize.width,
     );
 
-    img.Image src = img.decodeJpg(Uint8List.fromList(bytes))!;
-
-    final profile = await CapabilityProfile.load();
-    final generator = Generator(
-      paperSize,
-      profile,
-      spaceBetweenRows: 0,
-    );
-    List<int> imageData;
-    if (useImageRaster) {
-      imageData = generator.imageRaster(
-        src,
-        highDensityHorizontal: true,
-        highDensityVertical: true,
-        imageFn: PosImageFn.bitImageRaster,
-        align: PosAlign.left,
-      );
-    } else {
-      imageData = generator.image(src);
-    }
-
-    final additional = [
-      ...generator.emptyLines(addFeeds),
+    final additional = <int>[
+      for (int i = 0; i < addFeeds; i++) ...'\x0A'.codeUnits,
     ];
 
     return printBytes(
       keepConnected: keepConnected,
       address: address,
       data: Uint8List.fromList([
-        ...generator.reset(),
+        ...reset,
         ...imageData,
-        ...generator.reset(),
+        ...reset,
         ...additional,
       ]),
       onProgress: onProgress,
+      maxBufferSize: maxBufferSize,
+      delayTime: delayTime,
     );
-  }
-
-  static Future<List<int>> _optimizeImage({
-    required List<int> src,
-    required PaperSize paperSize,
-    required int srcWidth,
-    required int srcHeight,
-  }) async {
-    final arg = <String, dynamic>{
-      'src': src,
-      'width': srcWidth,
-      'height': srcHeight,
-      'paperSize': paperSize,
-    };
-
-    if (kIsWeb) {
-      return _blackwhiteInternal(arg);
-    }
-
-    return compute(_blackwhiteInternal, arg);
-  }
-
-  static Future<List<int>> _blackwhiteInternal(Map<String, dynamic> arg) async {
-    final srcBytes = arg['src'] as List<int>;
-    final paperSize = arg['paperSize'] as PaperSize;
-
-    final bytes = Uint8List.fromList(srcBytes);
-    img.Image src = img.decodePng(bytes)!;
-
-    final w = src.width;
-    final h = src.height;
-
-    final res = img.Image(width: w, height: h);
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        final pixel = src.getPixel(x, y);
-
-        img.Color c;
-        final l = pixel.luminance / 255;
-        if (l > 0.8) {
-          c = img.ColorUint8.rgb(255, 255, 255);
-        } else {
-          c = img.ColorUint8.rgb(0, 0, 0);
-        }
-
-        res.setPixel(x, y, c);
-      }
-    }
-
-    src = res;
-    final dotsPerLine = paperSize.width;
-    src = img.copyResize(
-      src,
-      width: dotsPerLine,
-      maintainAspect: true,
-    );
-
-    return img.encodeJpg(src);
   }
 
   static Future<BluetoothDevice?> selectDevice(BuildContext context) async {

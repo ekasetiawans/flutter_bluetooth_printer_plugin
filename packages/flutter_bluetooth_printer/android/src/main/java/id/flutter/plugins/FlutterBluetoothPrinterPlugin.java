@@ -240,6 +240,15 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                             String address = call.argument("address");
                             boolean keepConnected = call.argument("keep_connected");
                             byte[] data = call.argument("data");
+                            int maxTxPacketSize = 512;
+                            if (call.hasArgument("max_buffer_size")){
+                                maxTxPacketSize =  call.argument("max_buffer_size");
+                            }
+
+                            int delayTime = 120;
+                            if (call.hasArgument("delay_time")){
+                               delayTime = call.argument("delay_time");
+                            }
 
                             final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
                             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
@@ -259,18 +268,15 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
                                 int tmpOffset = 0;
                                 int bytesToWrite = data.length;
-                                int mMaxTxPacketSize = 512;
                                 while (bytesToWrite > 0) {
-                                    int tmpLength = Math.min(bytesToWrite, mMaxTxPacketSize);
+                                    int tmpLength = Math.min(bytesToWrite, maxTxPacketSize);
                                     writeStream.write(data, tmpOffset, tmpLength);
-                                    writeStream.flush();
                                     tmpOffset += tmpLength;
                                     updatePrintingProgress(data.length, tmpOffset);
                                     bytesToWrite -= tmpLength;
-                                    Thread.sleep(60);
+                                    Thread.sleep(delayTime);
                                 }
-
-
+                                writeStream.flush();
                                 updatePrintingProgress(data.length, data.length);
                                 // waiting for printing completed
                                 Thread.sleep(3000);

@@ -45,6 +45,8 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
     required String address,
     required Uint8List data,
     bool keepConnected = false,
+    required int maxBufferSize,
+    required int delayTime,
     ProgressCallback? onProgress,
   });
 

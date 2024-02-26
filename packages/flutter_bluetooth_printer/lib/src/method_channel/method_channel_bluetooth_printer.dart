@@ -111,6 +111,8 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
     required String address,
     required Uint8List data,
     bool keepConnected = false,
+    required int maxBufferSize,
+    required int delayTime,
     ProgressCallback? onProgress,
   }) async {
     try {
@@ -133,6 +135,8 @@ class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
         'address': address,
         'data': data,
         'keep_connected': keepConnected,
+        'delay_time': delayTime,
+        'max_buffer_size': maxBufferSize,
       });
 
       _progressCallback = null;

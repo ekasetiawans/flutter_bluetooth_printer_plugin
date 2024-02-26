@@ -1,22 +1,19 @@
-import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 void main() {
-  const MethodChannel channel =
-      MethodChannel('id.flutter.plugins/bluetooth_printer');
-  TestWidgetsFlutterBinding.ensureInitialized();
+  // const MethodChannel channel =
+  //     MethodChannel('id.flutter.plugins/bluetooth_printer');
+  // TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return [];
-    });
-  });
+  // setUp(() {
+  //   channel.setMockMethodCallHandler((MethodCall methodCall) async {
+  //     return [];
+  //   });
+  // });
 
-  tearDown(() {
-    channel.setMockMethodCallHandler(null);
-  });
+  // tearDown(() {
+  //   channel.setMockMethodCallHandler(null);
+  // });
 
-  test('getBondedDevices', () async {
-    //expect(await BluetoothPrinter.instance.getBondedDevices(), []);
-  });
+  // test('getBondedDevices', () async {
+  //   //expect(await BluetoothPrinter.instance.getBondedDevices(), []);
+  // });
 }

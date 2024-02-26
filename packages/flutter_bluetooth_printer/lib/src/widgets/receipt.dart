@@ -1,19 +1,5 @@
 part of flutter_bluetooth_printer;
 
-extension PaperSizeName on PaperSize {
-  String get name {
-    if (this == PaperSize.mm58) {
-      return '58mm';
-    } else if (this == PaperSize.mm72) {
-      return '72mm';
-    } else if (this == PaperSize.mm80) {
-      return '80mm';
-    }
-
-    return 'Unknown';
-  }
-}
-
 class ReceiptController with ChangeNotifier {
   final ReceiptState _state;
 
@@ -33,14 +19,14 @@ class ReceiptController with ChangeNotifier {
     ProgressCallback? onProgress,
 
     /// add lines after print
-    int linesAfter = 0,
+    int addFeeds = 0,
     bool useImageRaster = false,
     bool keepConnected = false,
   }) {
     return _state.print(
       address: address,
       onProgress: onProgress,
-      addFeeds: linesAfter,
+      addFeeds: addFeeds,
       useImageRaster: useImageRaster,
       keepConnected: keepConnected,
     );
@@ -75,7 +61,7 @@ class ReceiptState extends State<Receipt> {
     super.initState();
     controller = ReceiptController._(state: this);
     controller.addListener(_listener);
-    Future.microtask(() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       widget.onInitialized(controller);
     });
   }
@@ -148,6 +134,8 @@ class ReceiptState extends State<Receipt> {
     int addFeeds = 0,
     bool useImageRaster = false,
     bool keepConnected = false,
+    int maxBufferSize = 512,
+    int delayTime = 120,
   }) async {
     int quality = 4;
     final RenderRepaintBoundary boundary =
@@ -166,6 +154,8 @@ class ReceiptState extends State<Receipt> {
       addFeeds: addFeeds,
       useImageRaster: useImageRaster,
       keepConnected: keepConnected,
+      maxBufferSize: maxBufferSize,
+      delayTime: delayTime,
     );
   }
 }
