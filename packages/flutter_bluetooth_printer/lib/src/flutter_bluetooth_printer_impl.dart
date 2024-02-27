@@ -69,14 +69,14 @@ class FlutterBluetoothPrinter {
     int maxBufferSize = 512,
     int delayTime = 120,
   }) async {
-    final reset = '\x1B\x40'.codeUnits;
+    const reset = Commands.initialize;
     final imageData = await ImageUtils.encode(
       bytes: imageBytes,
       dotsPerLine: paperSize.width,
     );
 
     final additional = <int>[
-      for (int i = 0; i < addFeeds; i++) ...'\x0A'.codeUnits,
+      for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
     ];
 
     return printBytes(

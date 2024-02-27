@@ -1,8 +1,8 @@
 library flutter_bluetooth_printer;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_printer_platform_interface/flutter_bluetooth_printer_platform_interface.dart';
 import 'package:image/image.dart' as img;
 
+part 'src/commands.dart';
 part 'src/errors/busy_device_exception.dart';
 part 'src/flutter_bluetooth_printer_impl.dart';
 part 'src/image_utils.dart';

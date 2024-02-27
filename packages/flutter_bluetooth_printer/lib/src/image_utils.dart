@@ -22,7 +22,6 @@ class ImageUtils {
   }
 
   static List<int> _imageRaster(img.Image image) {
-    List<int> bytes = [];
     final int widthPx = image.width;
     final int heightPx = image.height;
     final int widthBytes = (widthPx + 7) ~/ 8;
@@ -34,9 +33,11 @@ class ImageUtils {
     header.add(densityByte);
     header.addAll(_intLowHigh(widthBytes, 2)); // xL xH
     header.addAll(_intLowHigh(heightPx, 2)); // yL yH
-    bytes += List.from(header)..addAll(resterizedData);
 
-    return bytes;
+    return <int>[
+      ...header,
+      ...resterizedData,
+    ];
   }
 
   /// Image rasterization
@@ -45,12 +46,10 @@ class ImageUtils {
     final int widthPx = image.width;
     final int heightPx = image.height;
 
-    img.grayscale(image);
     img.invert(image);
 
     // R/G/B channels are same -> keep only one channel
     final List<int> oneChannelBytes = [];
-    // final List<int> buffer = image.getBytes(format: Format.rgba);
     final List<int> buffer = image.getBytes(order: img.ChannelOrder.rgba);
     for (int i = 0; i < buffer.length; i += 4) {
       oneChannelBytes.add(buffer[i]);
@@ -75,7 +74,7 @@ class ImageUtils {
   static List<int> _packBitsIntoBytes(List<int> bytes) {
     const pxPerLine = 8;
     final List<int> res = <int>[];
-    const threshold = 127; // set the greyscale -> b/w threshold here
+    const threshold = 256 * 0.5; // set the greyscale -> b/w threshold here
     for (int i = 0; i < bytes.length; i += pxPerLine) {
       int newVal = 0;
       for (int j = 0; j < pxPerLine; j++) {

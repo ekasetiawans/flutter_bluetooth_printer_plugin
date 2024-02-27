@@ -39,15 +39,16 @@ class CUPSPrinterDriver extends FlutterBluetoothPrinterPlatform {
     required int delayTime,
     ProgressCallback? onProgress,
   }) async {
+    final prnFile = File('tmp.prn');
+    await prnFile.writeAsBytes(data);
+
     final process = await Process.start(
       'lpr',
-      ['-P', address, "-o", "raw", "-o", "media=Transparency"],
+      ['-P', address, "tmp.prn"],
     );
 
-    process.stdin.add(data);
-    process.stdin.add('\r\n'.codeUnits);
-    process.stdin.close();
     await process.exitCode;
+    await prnFile.delete();
     onProgress?.call(1, 1);
   }
 }
