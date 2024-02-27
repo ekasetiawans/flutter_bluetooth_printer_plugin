@@ -32,6 +32,8 @@ flutter:
         dartPluginClass: MethodChannelBluetoothPrinter
 
   fonts:
-    - family: HermeneusOne
+    - family: Receipt
       fonts:
-        - asset: fonts/HermeneusOne-Regular.ttf
+        - asset: fonts/JetBrainsMono-Regular.ttf
+        - asset: fonts/JetBrainsMono-ExtraBold.ttf
+          weight: 600

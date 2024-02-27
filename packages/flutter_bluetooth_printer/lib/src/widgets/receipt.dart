@@ -107,10 +107,13 @@ class ReceiptState extends State<Receipt> {
                       child: DefaultTextStyle.merge(
                         style: const TextStyle(
                           fontSize: 24,
-                          height: 1.1,
+                          height: 1.0,
                           color: Colors.black,
-                          fontFamily: 'HermeneusOne',
+                          fontFamily: 'Receipt',
                           package: 'flutter_bluetooth_printer',
+                          fontFeatures: [
+                            FontFeature.slashedZero(),
+                          ],
                         ).merge(widget.defaultTextStyle),
                         child: SizedBox(
                           width: _paperSize.width.toDouble(),
