@@ -1,3 +1,7 @@
+## 2.12.0
+
+ - **FEAT**: change default receipt font to jetbrains-mono.
+
 ## 2.11.2
 
  - **FIX**: duplicated class.

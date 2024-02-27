@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.12.0`](#flutter_bluetooth_printer---v2120)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.12.0`
+
+ - **FEAT**: change default receipt font to jetbrains-mono.
+
+
+## 2024-02-27
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.11.2`](#flutter_bluetooth_printer---v2112)
 
 ---
