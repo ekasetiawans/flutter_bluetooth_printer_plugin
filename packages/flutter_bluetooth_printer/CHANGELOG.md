@@ -1,3 +1,7 @@
+## 2.11.1
+
+ - **DOCS**: update LICENSE.
+
 ## 2.11.0
 
  - **FEAT**: added macos.

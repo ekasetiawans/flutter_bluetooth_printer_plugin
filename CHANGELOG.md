@@ -15,6 +15,32 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.11.1`](#flutter_bluetooth_printer---v2111)
+ - [`flutter_bluetooth_printer_macos` - `v1.1.1`](#flutter_bluetooth_printer_macos---v111)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.11.1`
+
+ - **DOCS**: update LICENSE.
+
+#### `flutter_bluetooth_printer_macos` - `v1.1.1`
+
+ - **DOCS**: update LICENSE.
+
+
+## 2024-02-27
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.11.0`](#flutter_bluetooth_printer---v2110)
  - [`flutter_bluetooth_printer_macos` - `v1.1.0`](#flutter_bluetooth_printer_macos---v110)
 
