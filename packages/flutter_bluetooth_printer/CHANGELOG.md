@@ -1,3 +1,7 @@
+## 2.11.2
+
+ - **FIX**: duplicated class.
+
 ## 2.11.1
 
  - **DOCS**: update LICENSE.
