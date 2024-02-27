@@ -14,6 +14,7 @@ dependencies:
   image: ">=4.1.7"
   flutter_bluetooth_printer_platform_interface: ^0.0.5
   plugin_platform_interface: ^2.1.2
+  flutter_bluetooth_printer_macos: ^0.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -25,10 +26,10 @@ flutter:
       android:
         package: id.flutter.plugins
         pluginClass: FlutterBluetoothPrinterPlugin
-        dartPluginClass: FlutterBluetoothPrinter
+        dartPluginClass: MethodChannelBluetoothPrinter
       ios:
         pluginClass: FlutterBluetoothPrinterPlugin
-        dartPluginClass: FlutterBluetoothPrinter
+        dartPluginClass: MethodChannelBluetoothPrinter
 
   fonts:
     - family: HermeneusOne

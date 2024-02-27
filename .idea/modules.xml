@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/packages/flutter_bluetooth_printer/melos_flutter_bluetooth_printer.iml" filepath="$PROJECT_DIR$/packages/flutter_bluetooth_printer/melos_flutter_bluetooth_printer.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/flutter_bluetooth_printer/example/melos_flutter_bluetooth_printer_example.iml" filepath="$PROJECT_DIR$/packages/flutter_bluetooth_printer/example/melos_flutter_bluetooth_printer_example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/flutter_bluetooth_printer_macos/melos_flutter_bluetooth_printer_macos.iml" filepath="$PROJECT_DIR$/packages/flutter_bluetooth_printer_macos/melos_flutter_bluetooth_printer_macos.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/flutter_bluetooth_printer_platform_interface/melos_flutter_bluetooth_printer_platform_interface.iml" filepath="$PROJECT_DIR$/packages/flutter_bluetooth_printer_platform_interface/melos_flutter_bluetooth_printer_platform_interface.iml" />
       <module fileurl="file://$PROJECT_DIR$/melos_flutter_bluetooth_printer.iml" filepath="$PROJECT_DIR$/melos_flutter_bluetooth_printer.iml" />
     </modules>

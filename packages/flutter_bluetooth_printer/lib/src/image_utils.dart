@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:image/image.dart';
+part of flutter_bluetooth_printer;
 
 class ImageUtils {
   static List<int> _intLowHigh(int value, int bytesNb) {
@@ -22,7 +21,7 @@ class ImageUtils {
     return res;
   }
 
-  static List<int> _imageRaster(Image image) {
+  static List<int> _imageRaster(img.Image image) {
     List<int> bytes = [];
     final int widthPx = image.width;
     final int heightPx = image.height;
@@ -41,18 +40,18 @@ class ImageUtils {
   }
 
   /// Image rasterization
-  static List<int> _toRasterFormat(Image imgSrc) {
-    final Image image = Image.from(imgSrc); // make a copy
+  static List<int> _toRasterFormat(img.Image imgSrc) {
+    final img.Image image = img.Image.from(imgSrc); // make a copy
     final int widthPx = image.width;
     final int heightPx = image.height;
 
-    grayscale(image);
-    invert(image);
+    img.grayscale(image);
+    img.invert(image);
 
     // R/G/B channels are same -> keep only one channel
     final List<int> oneChannelBytes = [];
     // final List<int> buffer = image.getBytes(format: Format.rgba);
-    final List<int> buffer = image.getBytes(order: ChannelOrder.rgba);
+    final List<int> buffer = image.getBytes(order: img.ChannelOrder.rgba);
     for (int i = 0; i < buffer.length; i += 4) {
       oneChannelBytes.add(buffer[i]);
     }
@@ -97,27 +96,27 @@ class ImageUtils {
         ((newValue ? 1 : 0) << shift);
   }
 
-  static Future<Image> _optimizeImage({
+  static Future<img.Image> _optimizeImage({
     required Uint8List bytes,
     required int dotsPerLine,
   }) async {
-    Image src = decodePng(bytes)!;
-    src = grayscale(src);
+    img.Image src = img.decodePng(bytes)!;
+    src = img.grayscale(src);
 
     final w = src.width;
     final h = src.height;
 
-    final res = Image(width: w, height: h);
+    final res = img.Image(width: w, height: h);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         final pixel = src.getPixel(x, y);
 
-        Color c;
+        img.Color c;
         final l = pixel.luminance / 65535;
         if (l > 0.8) {
-          c = ColorUint8.rgb(255, 255, 255);
+          c = img.ColorUint8.rgb(255, 255, 255);
         } else {
-          c = ColorUint8.rgb(0, 0, 0);
+          c = img.ColorUint8.rgb(0, 0, 0);
         }
 
         res.setPixel(x, y, c);
@@ -125,7 +124,7 @@ class ImageUtils {
     }
 
     src = res;
-    src = copyResize(
+    src = img.copyResize(
       src,
       width: dotsPerLine,
       maintainAspect: true,

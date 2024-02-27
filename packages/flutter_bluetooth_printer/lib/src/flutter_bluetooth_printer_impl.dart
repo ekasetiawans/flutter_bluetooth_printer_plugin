@@ -17,10 +17,6 @@ enum PaperSize {
 }
 
 class FlutterBluetoothPrinter {
-  static void registerWith() {
-    FlutterBluetoothPrinterPlatform.instance = _MethodChannelBluetoothPrinter();
-  }
-
   static Stream<DiscoveryState> _discovery() async* {
     final result = <BluetoothDevice>[];
     await for (final state

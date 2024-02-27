@@ -8,7 +8,11 @@ class BluetoothDisabledState extends DiscoveryState {}
 
 class BluetoothEnabledState extends DiscoveryState {}
 
-class _MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
+class MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
+  static void registerWith() {
+    FlutterBluetoothPrinterPlatform.instance = MethodChannelBluetoothPrinter();
+  }
+
   final channel = const MethodChannel('maseka.dev/flutter_bluetooth_printer');
   final discoveryChannel =
       const EventChannel('maseka.dev/flutter_bluetooth_printer/discovery');

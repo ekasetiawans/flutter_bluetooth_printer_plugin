@@ -1,6 +1,8 @@
-# melos_managed_dependency_overrides: flutter_bluetooth_printer,flutter_bluetooth_printer_platform_interface
+# melos_managed_dependency_overrides: flutter_bluetooth_printer,flutter_bluetooth_printer_platform_interface,flutter_bluetooth_printer_macos
 dependency_overrides:
   flutter_bluetooth_printer:
     path: ..
+  flutter_bluetooth_printer_macos:
+    path: ../../flutter_bluetooth_printer_macos
   flutter_bluetooth_printer_platform_interface:
     path: ../../flutter_bluetooth_printer_platform_interface
