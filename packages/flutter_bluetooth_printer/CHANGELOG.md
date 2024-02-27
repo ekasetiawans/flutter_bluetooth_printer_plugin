@@ -1,3 +1,7 @@
+## 2.11.0
+
+ - **FEAT**: added macos.
+
 ## 2.10.0
 
  - **FEAT**: remove esc_pos_utils dependencies.

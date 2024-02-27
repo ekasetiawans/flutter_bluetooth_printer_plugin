@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-02-27
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.11.0`](#flutter_bluetooth_printer---v2110)
+ - [`flutter_bluetooth_printer_macos` - `v1.1.0`](#flutter_bluetooth_printer_macos---v110)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.11.0`
+
+ - **FEAT**: added macos.
+
+#### `flutter_bluetooth_printer_macos` - `v1.1.0`
+
+ - **FEAT**: added macos.
+
+
 ## 2024-02-26
 
 ### Changes
