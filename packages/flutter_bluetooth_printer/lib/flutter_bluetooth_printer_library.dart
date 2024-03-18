@@ -1,16 +1,14 @@
 library flutter_bluetooth_printer;
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_printer_platform_interface/flutter_bluetooth_printer_platform_interface.dart';
 import 'package:image/image.dart' as img;
-import 'dart:convert' show json, utf8;
-import 'package:flutter/services.dart' show rootBundle;
 
 part 'src/capabilities.dart';
 part 'src/commands.dart';

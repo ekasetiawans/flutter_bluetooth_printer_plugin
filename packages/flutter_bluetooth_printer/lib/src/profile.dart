@@ -33,7 +33,7 @@ class CapabilityProfile {
       /// assert that the capabilities will be not empty
       assert(printCapabilities.isNotEmpty);
     } else {
-      print("capabilities.length is already loaded");
+      debugPrint("capabilities.length is already loaded");
     }
   }
 
