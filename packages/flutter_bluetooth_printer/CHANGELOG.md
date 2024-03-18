@@ -1,3 +1,8 @@
+## 2.12.2
+
+ - **FIX**: image raster.
+ - **FIX**: lints.
+
 ## 2.12.1
 
  - **REFACTOR**: improve image process.

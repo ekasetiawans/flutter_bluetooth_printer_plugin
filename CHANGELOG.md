@@ -15,6 +15,28 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.12.2`](#flutter_bluetooth_printer---v2122)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.12.2`
+
+ - **FIX**: image raster.
+ - **FIX**: lints.
+
+
+## 2024-03-18
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.12.1`](#flutter_bluetooth_printer---v2121)
  - [`flutter_bluetooth_printer_macos` - `v1.1.2`](#flutter_bluetooth_printer_macos---v112)
 
