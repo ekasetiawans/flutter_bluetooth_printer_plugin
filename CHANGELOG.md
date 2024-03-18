@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.12.3`](#flutter_bluetooth_printer---v2123)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.12.3`
+
+ - **FIX**: encode to jpg.
+
+
+## 2024-03-18
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.12.2`](#flutter_bluetooth_printer---v2122)
 
 ---

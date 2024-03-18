@@ -1,3 +1,7 @@
+## 2.12.3
+
+ - **FIX**: encode to jpg.
+
 ## 2.12.2
 
  - **FIX**: image raster.
