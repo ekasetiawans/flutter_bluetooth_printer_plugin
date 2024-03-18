@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.12.4`](#flutter_bluetooth_printer---v2124)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.12.4`
+
+ - **FIX**: black print.
+
+
+## 2024-03-18
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.12.3`](#flutter_bluetooth_printer---v2123)
 
 ---

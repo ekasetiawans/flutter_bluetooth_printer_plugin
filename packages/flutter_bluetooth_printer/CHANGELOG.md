@@ -1,3 +1,7 @@
+## 2.12.4
+
+ - **FIX**: black print.
+
 ## 2.12.3
 
  - **FIX**: encode to jpg.
