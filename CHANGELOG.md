@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-03-18
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.12.1`](#flutter_bluetooth_printer---v2121)
+ - [`flutter_bluetooth_printer_macos` - `v1.1.2`](#flutter_bluetooth_printer_macos---v112)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.12.1`
+
+ - **REFACTOR**: improve image process.
+ - **FIX**: useImageRaster.
+
+#### `flutter_bluetooth_printer_macos` - `v1.1.2`
+
+ - **REFACTOR**: improve image process.
+
+
 ## 2024-02-27
 
 ### Changes

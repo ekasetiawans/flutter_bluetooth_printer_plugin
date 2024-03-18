@@ -1,3 +1,8 @@
+## 2.12.1
+
+ - **REFACTOR**: improve image process.
+ - **FIX**: useImageRaster.
+
 ## 2.12.0
 
  - **FEAT**: change default receipt font to jetbrains-mono.

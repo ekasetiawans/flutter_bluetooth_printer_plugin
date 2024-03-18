@@ -1,3 +1,7 @@
+## 1.1.2
+
+ - **REFACTOR**: improve image process.
+
 ## 1.1.1
 
  - **DOCS**: update LICENSE.
