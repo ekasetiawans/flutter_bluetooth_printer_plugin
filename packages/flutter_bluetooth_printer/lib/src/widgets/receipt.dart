@@ -20,7 +20,7 @@ class ReceiptController with ChangeNotifier {
 
     /// add lines after print
     int addFeeds = 0,
-    bool useImageRaster = false,
+    bool useImageRaster = true,
     bool keepConnected = false,
   }) {
     return _state.print(
@@ -135,21 +135,22 @@ class ReceiptState extends State<Receipt> {
     required String address,
     ProgressCallback? onProgress,
     int addFeeds = 0,
-    bool useImageRaster = false,
+    bool useImageRaster = true,
     bool keepConnected = false,
     int maxBufferSize = 512,
     int delayTime = 120,
   }) async {
-    int quality = 4;
+    int quality = 1;
     final RenderRepaintBoundary boundary =
         _localKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: quality.toDouble());
     final byteData = await image.toByteData(format: ImageByteFormat.png);
     final bytes = byteData!.buffer.asUint8List();
+    var src = img.decodePng(bytes)!;
 
     await FlutterBluetoothPrinter.printImage(
       address: address,
-      imageBytes: bytes,
+      imageBytes: img.encodeJpg(src),
       imageWidth: image.width,
       imageHeight: image.height,
       paperSize: _paperSize,

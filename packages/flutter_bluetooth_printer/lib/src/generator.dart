@@ -128,13 +128,11 @@ class Generator {
         ((newValue ? 1 : 0) << shift);
   }
 
-  Future<img.Image> _optimizeImage({
+  Future<img.Image> optimizeImage({
     required Uint8List bytes,
     required int dotsPerLine,
   }) async {
-    img.Image src = img.decodePng(bytes)!;
-    final b = img.encodeJpg(src);
-    src = img.decodeJpg(b)!;
+    img.Image src = img.decodeJpg(bytes)!;
     src = img.grayscale(src);
 
     final w = src.width;
@@ -143,10 +141,11 @@ class Generator {
     final res = img.Image(width: w, height: h);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
-        final pixel = src.getPixel(x, y);
+        final pixel = src.getPixelSafe(x, y);
+        final lum = img.getLuminanceRgb(pixel.r, pixel.g, pixel.b);
 
         img.Color c;
-        final l = pixel.luminance / 65535;
+        final l = lum / 255;
         if (l > 0.8) {
           c = img.ColorUint8.rgb(255, 255, 255);
         } else {
@@ -172,7 +171,7 @@ class Generator {
     final pngBytes = arg['bytes'];
     final useImageRaster = arg['useImageRaster'];
 
-    final image = await _optimizeImage(
+    final image = await optimizeImage(
       dotsPerLine: dotsPerLine,
       bytes: pngBytes,
     );
