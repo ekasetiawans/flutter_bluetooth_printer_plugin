@@ -1,7 +1,13 @@
 part of flutter_bluetooth_printer;
 
-class ImageUtils {
-  static List<int> _intLowHigh(int value, int bytesNb) {
+class Generator {
+  List<int> reset() {
+    List<int> bytes = [];
+    bytes += cInit.codeUnits;
+    return bytes;
+  }
+
+  List<int> _intLowHigh(int value, int bytesNb) {
     final dynamic maxInput = 256 << (bytesNb * 8) - 1;
 
     if (bytesNb < 1 || bytesNb > 4) {
@@ -21,14 +27,14 @@ class ImageUtils {
     return res;
   }
 
-  static List<int> _imageRaster(img.Image image) {
+  List<int> _imageRaster(img.Image image) {
     final int widthPx = image.width;
     final int heightPx = image.height;
     final int widthBytes = (widthPx + 7) ~/ 8;
     final List<int> resterizedData = _toRasterFormat(image);
     const int densityByte = 0;
     final List<int> header = <int>[
-      ...'\x1Dv0'.codeUnits,
+      ...cRasterImg2.codeUnits,
     ];
     header.add(densityByte);
     header.addAll(_intLowHigh(widthBytes, 2)); // xL xH
@@ -40,12 +46,39 @@ class ImageUtils {
     ];
   }
 
+  List<int> _graphic(img.Image image) {
+    final int widthPx = image.width;
+    final int heightPx = image.height;
+    final int widthBytes = (widthPx + 7) ~/ 8;
+    final List<int> resterizedData = _toRasterFormat(image);
+    // 'GS ( L' - FN_112 (Image data)
+    final List<int> header1 = List.from(cRasterImg.codeUnits);
+    header1.addAll(_intLowHigh(widthBytes * heightPx + 10, 2)); // pL pH
+    header1.addAll([48, 112, 48]); // m=48, fn=112, a=48
+    header1.addAll([1, 1]); // bx=1, by=1
+    header1.addAll([49]); // c=49
+    header1.addAll(_intLowHigh(widthBytes, 2)); // xL xH
+    header1.addAll(_intLowHigh(heightPx, 2)); // yL yH
+
+    // 'GS ( L' - FN_50 (Run print)
+    final List<int> header2 = List.from("\x1D(L".codeUnits);
+    header2.addAll([2, 0]); // pL pH
+    header2.addAll([48, 50]); // m fn[2,50]
+
+    return <int>[
+      ...header1,
+      ...resterizedData,
+      ...header2,
+    ];
+  }
+
   /// Image rasterization
-  static List<int> _toRasterFormat(img.Image imgSrc) {
+  List<int> _toRasterFormat(img.Image imgSrc) {
     final img.Image image = img.Image.from(imgSrc); // make a copy
     final int widthPx = image.width;
     final int heightPx = image.height;
 
+    img.grayscale(image);
     img.invert(image);
 
     // R/G/B channels are same -> keep only one channel
@@ -71,7 +104,7 @@ class ImageUtils {
   }
 
   /// Merges each 8 values (bits) into one byte
-  static List<int> _packBitsIntoBytes(List<int> bytes) {
+  List<int> _packBitsIntoBytes(List<int> bytes) {
     const pxPerLine = 8;
     final List<int> res = <int>[];
     const threshold = 256 * 0.5; // set the greyscale -> b/w threshold here
@@ -90,12 +123,12 @@ class ImageUtils {
   }
 
   /// Replaces a single bit in a 32-bit unsigned integer.
-  static int _transformUint32Bool(int uint32, int shift, bool newValue) {
+  int _transformUint32Bool(int uint32, int shift, bool newValue) {
     return ((0xFFFFFFFF ^ (0x1 << shift)) & uint32) |
         ((newValue ? 1 : 0) << shift);
   }
 
-  static Future<img.Image> _optimizeImage({
+  Future<img.Image> _optimizeImage({
     required Uint8List bytes,
     required int dotsPerLine,
   }) async {
@@ -132,25 +165,32 @@ class ImageUtils {
     return src;
   }
 
-  static Future<List<int>> _encodeImage(Map<String, dynamic> arg) async {
+  Future<List<int>> _encodeImage(Map<String, dynamic> arg) async {
     final dotsPerLine = arg['dotsPerLine'];
     final pngBytes = arg['bytes'];
+    final useImageRaster = arg['useImageRaster'];
 
     final image = await _optimizeImage(
       dotsPerLine: dotsPerLine,
       bytes: pngBytes,
     );
 
-    return _imageRaster(image);
+    if (useImageRaster) {
+      return _imageRaster(image);
+    }
+
+    return _graphic(image);
   }
 
-  static Future<List<int>> encode({
+  Future<List<int>> encode({
     required Uint8List bytes,
     required int dotsPerLine,
+    required bool useImageRaster,
   }) {
     final arg = {
       'bytes': bytes,
       'dotsPerLine': dotsPerLine,
+      'useImageRaster': useImageRaster,
     };
 
     return compute(_encodeImage, arg);
