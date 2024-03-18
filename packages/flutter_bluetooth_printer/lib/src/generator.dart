@@ -133,6 +133,8 @@ class Generator {
     required int dotsPerLine,
   }) async {
     img.Image src = img.decodePng(bytes)!;
+    final b = img.encodeJpg(src);
+    src = img.decodeJpg(b)!;
     src = img.grayscale(src);
 
     final w = src.width;
