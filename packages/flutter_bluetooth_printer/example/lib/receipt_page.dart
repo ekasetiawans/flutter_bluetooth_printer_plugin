@@ -215,7 +215,6 @@ class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
     widget.controller.print(
       address: widget.device,
       addFeeds: 5,
-      useImageRaster: true,
       keepConnected: true,
       onProgress: (total, sent) {
         if (mounted) {

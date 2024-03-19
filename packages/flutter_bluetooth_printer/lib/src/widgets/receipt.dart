@@ -20,14 +20,12 @@ class ReceiptController with ChangeNotifier {
 
     /// add lines after print
     int addFeeds = 0,
-    bool useImageRaster = true,
     bool keepConnected = false,
   }) {
     return _state.print(
       address: address,
       onProgress: onProgress,
       addFeeds: addFeeds,
-      useImageRaster: useImageRaster,
       keepConnected: keepConnected,
     );
   }
@@ -35,6 +33,7 @@ class ReceiptController with ChangeNotifier {
 
 class Receipt extends StatefulWidget {
   final WidgetBuilder builder;
+  final Widget Function(BuildContext context, Widget child)? containerBuilder;
   final Color backgroundColor;
   final TextStyle? defaultTextStyle;
   final void Function(ReceiptController controller) onInitialized;
@@ -45,6 +44,7 @@ class Receipt extends StatefulWidget {
     this.backgroundColor = Colors.grey,
     required this.builder,
     required this.onInitialized,
+    this.containerBuilder,
   }) : super(key: key);
 
   @override
@@ -84,6 +84,33 @@ class ReceiptState extends State<Receipt> {
 
   @override
   Widget build(BuildContext context) {
+    var receipt = RepaintBoundary(
+      key: _localKey,
+      child: Container(
+        color: Colors.white,
+        child: DefaultTextStyle.merge(
+          style: const TextStyle(
+            fontSize: 24,
+            height: 1.0,
+            color: Colors.black,
+            fontFamily: 'Receipt',
+            package: 'flutter_bluetooth_printer',
+            fontFeatures: [
+              FontFeature.slashedZero(),
+            ],
+          ).merge(widget.defaultTextStyle),
+          child: SizedBox(
+            width: _paperSize.width.toDouble(),
+            child: Builder(builder: widget.builder),
+          ),
+        ),
+      ),
+    );
+
+    if (widget.containerBuilder != null) {
+      return widget.containerBuilder!(context, receipt);
+    }
+
     return Container(
       color: widget.backgroundColor,
       child: ClipRect(
@@ -100,28 +127,7 @@ class ReceiptState extends State<Receipt> {
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   color: Colors.white,
-                  child: RepaintBoundary(
-                    key: _localKey,
-                    child: Container(
-                      color: Colors.white,
-                      child: DefaultTextStyle.merge(
-                        style: const TextStyle(
-                          fontSize: 24,
-                          height: 1.0,
-                          color: Colors.black,
-                          fontFamily: 'Receipt',
-                          package: 'flutter_bluetooth_printer',
-                          fontFeatures: [
-                            FontFeature.slashedZero(),
-                          ],
-                        ).merge(widget.defaultTextStyle),
-                        child: SizedBox(
-                          width: _paperSize.width.toDouble(),
-                          child: Builder(builder: widget.builder),
-                        ),
-                      ),
-                    ),
-                  ),
+                  child: receipt,
                 ),
               ),
             ),
@@ -135,7 +141,6 @@ class ReceiptState extends State<Receipt> {
     required String address,
     ProgressCallback? onProgress,
     int addFeeds = 0,
-    bool useImageRaster = true,
     bool keepConnected = false,
     int maxBufferSize = 512,
     int delayTime = 120,
@@ -156,7 +161,6 @@ class ReceiptState extends State<Receipt> {
       paperSize: _paperSize,
       onProgress: onProgress,
       addFeeds: addFeeds,
-      useImageRaster: useImageRaster,
       keepConnected: keepConnected,
       maxBufferSize: maxBufferSize,
       delayTime: delayTime,
