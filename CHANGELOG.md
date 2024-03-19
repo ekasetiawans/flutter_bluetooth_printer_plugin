@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-03-19
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.13.0`](#flutter_bluetooth_printer---v2130)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.13.0`
+
+ - **FEAT**: added containerBuilder to custom receipt layout.
+
+
 ## 2024-03-18
 
 ### Changes

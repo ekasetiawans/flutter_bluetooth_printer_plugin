@@ -1,3 +1,7 @@
+## 2.13.0
+
+ - **FEAT**: added containerBuilder to custom receipt layout.
+
 ## 2.12.4
 
  - **FIX**: black print.
