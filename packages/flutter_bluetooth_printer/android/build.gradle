@@ -22,6 +22,9 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+
+    namespace 'id.flutter.plugins.flutter_bluetooth_printer'
+    
     compileSdkVersion 31
 
     compileOptions {
