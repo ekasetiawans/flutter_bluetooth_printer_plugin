@@ -1,3 +1,7 @@
+## 2.14.0
+
+ - **FEAT**: expose maxBuffersize and delayTime.
+
 ## 2.13.0
 
  - **FEAT**: added containerBuilder to custom receipt layout.
