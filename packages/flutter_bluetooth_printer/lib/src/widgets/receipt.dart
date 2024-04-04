@@ -21,12 +21,16 @@ class ReceiptController with ChangeNotifier {
     /// add lines after print
     int addFeeds = 0,
     bool keepConnected = false,
+    int maxBufferSize = 512,
+    int delayTime = 120,
   }) {
     return _state.print(
       address: address,
       onProgress: onProgress,
       addFeeds: addFeeds,
       keepConnected: keepConnected,
+      maxBufferSize: maxBufferSize,
+      delayTime: delayTime,
     );
   }
 }
