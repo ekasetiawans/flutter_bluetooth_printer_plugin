@@ -88,21 +88,26 @@ class ReceiptState extends State<Receipt> {
 
   @override
   Widget build(BuildContext context) {
+    const style = TextStyle(
+      fontSize: 24,
+      height: 1.0,
+      color: Colors.black,
+    );
+
     var receipt = RepaintBoundary(
       key: _localKey,
       child: Container(
         color: Colors.white,
         child: DefaultTextStyle.merge(
-          style: const TextStyle(
-            fontSize: 24,
-            height: 1.0,
-            color: Colors.black,
-            fontFamily: 'Receipt',
-            package: 'flutter_bluetooth_printer',
-            fontFeatures: [
-              FontFeature.slashedZero(),
-            ],
-          ).merge(widget.defaultTextStyle),
+          style: widget.defaultTextStyle == null
+              ? const TextStyle(
+                  fontFamily: 'Receipt',
+                  package: 'flutter_bluetooth_printer',
+                  fontFeatures: [
+                    FontFeature.slashedZero(),
+                  ],
+                ).merge(style)
+              : widget.defaultTextStyle!.merge(style),
           child: SizedBox(
             width: _paperSize.width.toDouble(),
             child: Builder(builder: widget.builder),
