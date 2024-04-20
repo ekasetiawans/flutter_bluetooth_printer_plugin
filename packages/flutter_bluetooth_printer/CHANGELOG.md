@@ -1,3 +1,7 @@
+## 2.15.2
+
+ - **FIX**: ios, return false if failed to print.
+
 ## 2.15.1
 
  - **FIX**: return bool receipt controller.print.

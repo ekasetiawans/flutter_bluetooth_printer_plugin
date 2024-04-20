@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.15.2`](#flutter_bluetooth_printer---v2152)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.15.2`
+
+ - **FIX**: ios, return false if failed to print.
+
+
+## 2024-04-20
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.15.1`](#flutter_bluetooth_printer---v2151)
 
 ---
