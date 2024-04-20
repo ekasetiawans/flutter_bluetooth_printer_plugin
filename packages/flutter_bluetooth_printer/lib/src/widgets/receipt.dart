@@ -14,7 +14,7 @@ class ReceiptController with ChangeNotifier {
     required ReceiptState state,
   }) : _state = state;
 
-  Future<void> print({
+  Future<bool> print({
     required String address,
     ProgressCallback? onProgress,
 
@@ -147,7 +147,7 @@ class ReceiptState extends State<Receipt> {
     );
   }
 
-  Future<void> print({
+  Future<bool> print({
     required String address,
     ProgressCallback? onProgress,
     int addFeeds = 0,
@@ -163,7 +163,7 @@ class ReceiptState extends State<Receipt> {
     final bytes = byteData!.buffer.asUint8List();
     var src = img.decodePng(bytes)!;
 
-    await FlutterBluetoothPrinter.printImage(
+    return FlutterBluetoothPrinter.printImage(
       address: address,
       imageBytes: img.encodeJpg(src),
       imageWidth: image.width,
