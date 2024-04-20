@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.15.1`](#flutter_bluetooth_printer---v2151)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.15.1`
+
+ - **FIX**: return bool receipt controller.print.
+
+
+## 2024-04-20
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.15.0`](#flutter_bluetooth_printer---v2150)
  - [`flutter_bluetooth_printer_macos` - `v1.2.0`](#flutter_bluetooth_printer_macos---v120)
  - [`flutter_bluetooth_printer_platform_interface` - `v0.0.6`](#flutter_bluetooth_printer_platform_interface---v006)

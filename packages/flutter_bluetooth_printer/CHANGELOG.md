@@ -1,3 +1,7 @@
+## 2.15.1
+
+ - **FIX**: return bool receipt controller.print.
+
 ## 2.15.0
 
  - **FEAT**: return boolean for write result.
