@@ -1,3 +1,7 @@
+## 1.2.0
+
+ - **FEAT**: return boolean for write result.
+
 ## 1.1.2
 
  - **REFACTOR**: improve image process.

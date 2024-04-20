@@ -1,3 +1,7 @@
+## 2.15.0
+
+ - **FEAT**: return boolean for write result.
+
 ## 2.14.2
 
  - **FIX**: font style.

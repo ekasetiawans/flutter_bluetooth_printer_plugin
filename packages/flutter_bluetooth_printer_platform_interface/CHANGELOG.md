@@ -1,3 +1,7 @@
+## 0.0.6
+
+ - **FEAT**: return boolean for write result.
+
 ## 0.0.5
 
  - **FEAT**: remove esc_pos_utils dependencies.
