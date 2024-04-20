@@ -1,3 +1,7 @@
+## 2.14.1
+
+ - **FIX**: receipt text style.
+
 ## 2.14.0
 
  - **FEAT**: expose maxBuffersize and delayTime.

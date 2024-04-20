@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-04-20
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.14.1`](#flutter_bluetooth_printer---v2141)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.14.1`
+
+ - **FIX**: receipt text style.
+
+
 ## 2024-04-04
 
 ### Changes
