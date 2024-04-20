@@ -92,6 +92,9 @@ class ReceiptState extends State<Receipt> {
       fontSize: 24,
       height: 1.0,
       color: Colors.black,
+      fontFeatures: [
+        FontFeature.slashedZero(),
+      ],
     );
 
     var receipt = RepaintBoundary(
@@ -99,15 +102,13 @@ class ReceiptState extends State<Receipt> {
       child: Container(
         color: Colors.white,
         child: DefaultTextStyle.merge(
-          style: widget.defaultTextStyle == null
-              ? const TextStyle(
+          style: style.merge(
+            widget.defaultTextStyle ??
+                const TextStyle(
                   fontFamily: 'Receipt',
                   package: 'flutter_bluetooth_printer',
-                  fontFeatures: [
-                    FontFeature.slashedZero(),
-                  ],
-                ).merge(style)
-              : widget.defaultTextStyle!.merge(style),
+                ),
+          ),
           child: SizedBox(
             width: _paperSize.width.toDouble(),
             child: Builder(builder: widget.builder),
