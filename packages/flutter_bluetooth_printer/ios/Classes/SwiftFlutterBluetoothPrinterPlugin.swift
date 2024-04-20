@@ -151,6 +151,8 @@ public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, Flutte
                       }
                       self.channel.invokeMethod("didUpdateState", arguments: 3)
                   }
+              } didError: {
+                  result(false)
               }
               break
               

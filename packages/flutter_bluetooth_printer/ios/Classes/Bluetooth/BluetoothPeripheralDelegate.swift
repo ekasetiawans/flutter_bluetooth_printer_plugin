@@ -83,3 +83,4 @@ class BluetoothPeripheralDelegate: NSObject, CBPeripheralDelegate {
 }
 
 public typealias DidConnected = (() ->())
+public typealias DidConnectError = (() ->())

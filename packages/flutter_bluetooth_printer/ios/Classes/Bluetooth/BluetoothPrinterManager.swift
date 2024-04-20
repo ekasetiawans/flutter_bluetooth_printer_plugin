@@ -162,6 +162,8 @@ public class BluetoothPrinterManager {
                 return
             }
 
+            self.didConnectError?()
+            self.didConnectError = nil
             self.nearbyPrinterDidChange(.update(BluetoothPrinter(peripheral)))
             self.peripheralDelegate.disconnect(peripheral)
         }
@@ -214,8 +216,11 @@ public class BluetoothPrinterManager {
     }
 
     var didConnected: DidConnected?
-    public func connect(_ printer: BluetoothPrinter, didConnected: @escaping DidConnected) {
+    var didConnectError: DidConnectError?
+    public func connect(_ printer: BluetoothPrinter, didConnected: @escaping DidConnected, didError: @escaping DidConnectError) {
         self.didConnected = didConnected
+        self.didConnectError = didError
+        
         if (printer.state == .connected){
             didConnected()
             return
