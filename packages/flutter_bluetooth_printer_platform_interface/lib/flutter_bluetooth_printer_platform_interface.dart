@@ -41,7 +41,7 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
 
   Stream<DiscoveryState> get discovery;
 
-  Future<void> write({
+  Future<bool> write({
     required String address,
     required Uint8List data,
     bool keepConnected = false,

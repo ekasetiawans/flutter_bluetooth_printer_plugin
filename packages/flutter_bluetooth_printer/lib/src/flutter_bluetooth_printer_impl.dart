@@ -36,7 +36,7 @@ class FlutterBluetoothPrinter {
 
   static Stream<DiscoveryState> get discovery => _discovery();
 
-  static Future<void> printBytes({
+  static Future<bool> printBytes({
     required String address,
     required Uint8List data,
 
@@ -45,8 +45,8 @@ class FlutterBluetoothPrinter {
     int maxBufferSize = 512,
     int delayTime = 120,
     ProgressCallback? onProgress,
-  }) async {
-    await FlutterBluetoothPrinterPlatform.instance.write(
+  }) {
+    return FlutterBluetoothPrinterPlatform.instance.write(
       address: address,
       data: data,
       onProgress: onProgress,
@@ -56,7 +56,7 @@ class FlutterBluetoothPrinter {
     );
   }
 
-  static Future<void> printImage({
+  static Future<bool> printImage({
     required String address,
     required Uint8List imageBytes,
     required int imageWidth,

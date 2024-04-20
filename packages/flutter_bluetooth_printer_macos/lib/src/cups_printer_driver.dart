@@ -31,7 +31,7 @@ class CUPSPrinterDriver extends FlutterBluetoothPrinterPlatform {
   }
 
   @override
-  Future<void> write({
+  Future<bool> write({
     required String address,
     required Uint8List data,
     bool keepConnected = false,
@@ -50,5 +50,6 @@ class CUPSPrinterDriver extends FlutterBluetoothPrinterPlatform {
     await process.exitCode;
     await prnFile.delete();
     onProgress?.call(1, 1);
+    return true;
   }
 }
