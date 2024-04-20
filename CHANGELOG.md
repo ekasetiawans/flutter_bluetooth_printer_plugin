@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.14.2`](#flutter_bluetooth_printer---v2142)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.14.2`
+
+ - **FIX**: font style.
+
+
+## 2024-04-20
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.14.1`](#flutter_bluetooth_printer---v2141)
 
 ---

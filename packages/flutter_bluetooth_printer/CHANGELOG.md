@@ -1,3 +1,7 @@
+## 2.14.2
+
+ - **FIX**: font style.
+
 ## 2.14.1
 
  - **FIX**: receipt text style.
