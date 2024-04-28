@@ -1,3 +1,7 @@
+## 2.15.3
+
+ - **FIX**: improve print speed.
+
 ## 2.15.2
 
  - **FIX**: ios, return false if failed to print.
