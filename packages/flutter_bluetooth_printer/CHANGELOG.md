@@ -1,3 +1,7 @@
+## 2.15.4
+
+ - **FIX**: improve raster image.
+
 ## 2.15.3
 
  - **FIX**: improve print speed.

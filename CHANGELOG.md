@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.15.4`](#flutter_bluetooth_printer---v2154)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.15.4`
+
+ - **FIX**: improve raster image.
+
+
+## 2024-04-28
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.15.3`](#flutter_bluetooth_printer---v2153)
 
 ---
