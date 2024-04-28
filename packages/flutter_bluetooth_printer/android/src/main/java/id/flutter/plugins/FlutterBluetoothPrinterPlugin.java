@@ -245,11 +245,6 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                 maxTxPacketSize =  call.argument("max_buffer_size");
                             }
 
-                            int delayTime = 120;
-                            if (call.hasArgument("delay_time")){
-                               delayTime = call.argument("delay_time");
-                            }
-
                             final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
                             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
                             BluetoothSocket bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
@@ -270,16 +265,18 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                 int bytesToWrite = data.length;
                                 while (bytesToWrite > 0) {
                                     int tmpLength = Math.min(bytesToWrite, maxTxPacketSize);
+                                    int delay = tmpLength / 16;
                                     writeStream.write(data, tmpOffset, tmpLength);
                                     tmpOffset += tmpLength;
                                     updatePrintingProgress(data.length, tmpOffset);
                                     bytesToWrite -= tmpLength;
-                                    Thread.sleep(delayTime);
+                                    Thread.sleep(delay);
                                 }
                                 writeStream.flush();
                                 updatePrintingProgress(data.length, data.length);
                                 // waiting for printing completed
-                                Thread.sleep(3000);
+                                int waitTime = data.length/16;
+                                Thread.sleep(waitTime);
                                 writeStream.close();
 
                                 new Handler(Looper.getMainLooper()).post(() -> {
