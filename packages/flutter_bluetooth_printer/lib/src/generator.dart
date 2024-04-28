@@ -46,6 +46,38 @@ class Generator {
     ];
   }
 
+  Future<List<int>> rasterImage({
+    required Uint8List bytes,
+    required int dotsPerLine,
+  }) async {
+    img.Image src = img.decodeJpg(bytes)!;
+    src = img.grayscale(src);
+    src = img.copyResize(
+      src,
+      width: dotsPerLine,
+      maintainAspect: true,
+    );
+
+    final int widthPx = src.width;
+    final int heightPx = src.height;
+    final int widthBytes = widthPx ~/ 8;
+
+    final list = _toRasterFormat(src);
+
+    const int densityByte = 0;
+    final List<int> header = <int>[
+      ...cRasterImg2.codeUnits,
+    ];
+    header.add(densityByte);
+    header.addAll(_intLowHigh(widthBytes, 2)); // xL xH
+    header.addAll(_intLowHigh(heightPx, 2)); // yL yH
+
+    return <int>[
+      ...header,
+      ...list,
+    ];
+  }
+
   List<int> _graphic(img.Image image) {
     final int widthPx = image.width;
     final int heightPx = image.height;
@@ -181,6 +213,17 @@ class Generator {
     }
 
     return _image(image);
+  }
+
+  Future<List<int>> encodeX({
+    required Uint8List bytes,
+    required int dotsPerLine,
+    required bool useImageRaster,
+  }) async {
+    return rasterImage(
+      bytes: bytes,
+      dotsPerLine: dotsPerLine,
+    );
   }
 
   Future<List<int>> encode({

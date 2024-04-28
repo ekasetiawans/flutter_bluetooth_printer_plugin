@@ -72,7 +72,7 @@ class FlutterBluetoothPrinter {
     final generator = Generator();
     final reset = generator.reset();
 
-    final imageData = await generator.encode(
+    final imageData = await generator.encodeX(
       bytes: imageBytes,
       dotsPerLine: paperSize.width,
       useImageRaster: useImageRaster,
