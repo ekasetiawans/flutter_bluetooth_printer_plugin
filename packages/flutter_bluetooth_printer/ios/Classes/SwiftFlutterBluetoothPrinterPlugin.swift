@@ -72,6 +72,37 @@ public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, Flutte
               result(2)
               break
               
+          case "connect":
+              let parameter = call.arguments as! NSDictionary
+              let address = parameter["address"] as! NSString
+              
+              let devices = self.bluetoothPrinterManager.nearbyPrinters
+              var device: BluetoothPrinter?
+              for item in devices {
+                  if (item.identifier.uuidString == address as String){
+                      device = item
+                      break
+                  }
+              }
+              
+              if (device == nil) {
+                  result(false)
+                  return
+              }
+              
+              if device?.state != .connected {
+                  self.bluetoothPrinterManager.connect(device!) {
+                      result(true)
+                  } didError: {
+                      result(false)
+                  }
+                  return
+              }
+              
+              
+              result(false)
+              break
+              
           case "disconnect":
               let parameter = call.arguments as! NSDictionary
               let address = parameter["address"] as! NSString

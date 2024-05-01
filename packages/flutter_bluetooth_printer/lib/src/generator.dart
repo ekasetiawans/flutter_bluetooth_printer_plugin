@@ -50,7 +50,7 @@ class Generator {
     required Uint8List bytes,
     required int dotsPerLine,
   }) async {
-    img.Image src = img.decodeJpg(bytes)!;
+    img.Image src = img.decodePng(bytes)!;
     src = img.grayscale(src);
     src = img.copyResize(
       src,
@@ -215,13 +215,12 @@ class Generator {
     return _image(image);
   }
 
-  Future<List<int>> encodeX({
-    required Uint8List bytes,
-    required int dotsPerLine,
-    required bool useImageRaster,
-  }) async {
+  Future<List<int>> _encodeX(Map<String, dynamic> arg) async {
+    final dotsPerLine = arg['dotsPerLine'];
+    final pngBytes = arg['bytes'];
+
     return rasterImage(
-      bytes: bytes,
+      bytes: pngBytes,
       dotsPerLine: dotsPerLine,
     );
   }
@@ -237,7 +236,7 @@ class Generator {
       'useImageRaster': useImageRaster,
     };
 
-    return compute(_encodeImage, arg);
+    return compute(_encodeX, arg);
   }
 
   List<int> _image(

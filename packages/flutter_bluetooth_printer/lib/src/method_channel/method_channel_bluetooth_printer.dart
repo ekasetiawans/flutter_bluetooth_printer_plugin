@@ -168,4 +168,24 @@ class MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
 
     return false;
   }
+
+  @override
+  Future<bool> connect(String address) async {
+    final res = await channel.invokeMethod('connect', {
+      'address': address,
+    });
+
+    if (res is bool) {
+      return res;
+    }
+
+    return false;
+  }
+
+  @override
+  Future<BluetoothState> checkState() async {
+    final result = await channel.invokeMethod('getState');
+    final state = _intToState(result);
+    return state;
+  }
 }

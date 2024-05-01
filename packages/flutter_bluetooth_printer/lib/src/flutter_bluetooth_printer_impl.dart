@@ -72,7 +72,7 @@ class FlutterBluetoothPrinter {
     final generator = Generator();
     final reset = generator.reset();
 
-    final imageData = await generator.encodeX(
+    final imageData = await generator.encode(
       bytes: imageBytes,
       dotsPerLine: paperSize.width,
       useImageRaster: useImageRaster,
@@ -110,5 +110,13 @@ class FlutterBluetoothPrinter {
 
   static Future<bool> disconnect(String address) async {
     return FlutterBluetoothPrinterPlatform.instance.disconnect(address);
+  }
+
+  static Future<bool> connect(String address) async {
+    return FlutterBluetoothPrinterPlatform.instance.connect(address);
+  }
+
+  static Future<BluetoothState> getState() async {
+    return FlutterBluetoothPrinterPlatform.instance.checkState();
   }
 }

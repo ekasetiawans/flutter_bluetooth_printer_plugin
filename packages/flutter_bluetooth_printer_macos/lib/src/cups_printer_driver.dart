@@ -52,4 +52,14 @@ class CUPSPrinterDriver extends FlutterBluetoothPrinterPlatform {
     onProgress?.call(1, 1);
     return true;
   }
+
+  @override
+  Future<bool> connect(String address) async {
+    return true;
+  }
+
+  @override
+  Future<BluetoothState> checkState() async  {
+    return BluetoothState.enabled;
+  }
 }

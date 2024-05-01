@@ -50,7 +50,9 @@ abstract class FlutterBluetoothPrinterPlatform extends PlatformInterface {
     ProgressCallback? onProgress,
   });
 
+  Future<bool> connect(String address);
   Future<bool> disconnect(String address);
+  Future<BluetoothState> checkState();
 }
 
 class BluetoothDevice extends DiscoveryState {

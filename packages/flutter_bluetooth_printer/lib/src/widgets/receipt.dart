@@ -155,24 +155,25 @@ class ReceiptState extends State<Receipt> {
     int maxBufferSize = 512,
     int delayTime = 120,
   }) async {
-    int quality = 1;
+    final screenWidth = MediaQuery.of(context).size.width;
+    double quality = _paperSize.width / screenWidth;
+
     final RenderRepaintBoundary boundary =
         _localKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    final image = await boundary.toImage(pixelRatio: quality.toDouble());
+    final image = await boundary.toImage(pixelRatio: quality);
     final byteData = await image.toByteData(format: ImageByteFormat.png);
     final bytes = byteData!.buffer.asUint8List();
-    var src = img.decodePng(bytes)!;
 
     return FlutterBluetoothPrinter.printImage(
       address: address,
-      imageBytes: img.encodeJpg(src),
+      imageBytes: bytes,
       imageWidth: image.width,
       imageHeight: image.height,
       paperSize: _paperSize,
       onProgress: onProgress,
       addFeeds: addFeeds,
       keepConnected: keepConnected,
-      maxBufferSize: maxBufferSize,
+      maxBufferSize: bytes.length,
       delayTime: delayTime,
     );
   }
