@@ -1,3 +1,7 @@
+## 1.3.0
+
+ - **FEAT**: improve connection.
+
 ## 1.2.0
 
  - **FEAT**: return boolean for write result.

@@ -1,3 +1,7 @@
+## 2.16.0
+
+ - **FEAT**: improve connection.
+
 ## 2.15.4
 
  - **FIX**: improve raster image.

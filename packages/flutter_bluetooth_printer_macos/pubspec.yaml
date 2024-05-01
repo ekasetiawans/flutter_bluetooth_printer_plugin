@@ -1,6 +1,6 @@
 name: flutter_bluetooth_printer_macos
 description: "Flutter Bluetooth Printer support for macos, its using CUPS Driver"
-version: 1.2.0
+version: 1.3.0
 repository: https://github.com/ekasetiawans/flutter_bluetooth_printer_plugin
 
 environment:
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bluetooth_printer_platform_interface: ^0.0.6
+  flutter_bluetooth_printer_platform_interface: ^0.0.7
   plugin_platform_interface: ^2.1.2
 
 dev_dependencies:
