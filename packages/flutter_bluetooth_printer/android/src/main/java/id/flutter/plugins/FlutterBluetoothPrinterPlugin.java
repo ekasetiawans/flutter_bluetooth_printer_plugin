@@ -13,14 +13,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,11 +39,44 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 
 public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener, EventChannel.StreamHandler {
+    private final Map<Object, EventChannel.EventSink> sinkList = new HashMap<>();
+    private final BroadcastReceiver discoveryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                final Map<String, Object> map = deviceToMap(device);
+
+                for (EventChannel.EventSink sink : sinkList.values()) {
+                    sink.success(map);
+                }
+            }
+        }
+    };
     private MethodChannel channel;
     private Activity activity;
     private BluetoothAdapter bluetoothAdapter;
+    private final BroadcastReceiver stateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                final int value = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
+                if (value == BluetoothAdapter.STATE_OFF) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("code", 1);
+                    for (EventChannel.EventSink sink : sinkList.values()) {
+                        sink.success(data);
+                    }
+                } else if (value == BluetoothAdapter.STATE_ON) {
+                    startDiscovery(false);
+                }
+            }
+        }
+    };
     private FlutterPluginBinding flutterPluginBinding;
-    private Map<String, BluetoothSocket> connectedDevices = new HashMap<>();
+    private final Map<String, BluetoothSocket> connectedDevices = new HashMap<>();
     private Handler mainThread;
 
     @Override
@@ -69,40 +104,6 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         IntentFilter stateFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         flutterPluginBinding.getApplicationContext().registerReceiver(stateReceiver, stateFilter);
     }
-
-    private final BroadcastReceiver stateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-                final int value = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
-                if (value == BluetoothAdapter.STATE_OFF) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("code", 1);
-                    for (EventChannel.EventSink sink : sinkList.values()) {
-                        sink.success(data);
-                    }
-                } else if (value == BluetoothAdapter.STATE_ON) {
-                    startDiscovery(false);
-                }
-            }
-        }
-    };
-
-    private final BroadcastReceiver discoveryReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                final Map<String, Object> map = deviceToMap(device);
-
-                for (EventChannel.EventSink sink : sinkList.values()) {
-                    sink.success(map);
-                }
-            }
-        }
-    };
 
     private Map<String, Object> deviceToMap(BluetoothDevice device) {
         final HashMap<String, Object> map = new HashMap<>();
@@ -165,7 +166,6 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
         }
     }
 
-
     private void stopDiscovery() {
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
@@ -186,7 +186,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         final String method = call.method;
         switch (method) {
-            case "connect" : {
+            case "connect": {
                 new Thread(() -> {
                     synchronized (FlutterBluetoothPrinterPlugin.this) {
                         try {
@@ -283,29 +283,39 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                     connectedDevices.put(address, bluetoothSocket);
                                 }
 
-
+                                InputStream inputStream = bluetoothSocket.getInputStream();
                                 OutputStream writeStream = bluetoothSocket.getOutputStream();
+
+                                // req clear buffers
+                                writeStream.write(new byte[]{16, 20, 8, 1, 3, 20, 1, 6, 2, 8});
 
                                 // PRINTING
                                 mainThread.post(() -> channel.invokeMethod("didUpdateState", 2));
+                                assert data != null;
                                 updatePrintingProgress(data.length, 0);
 
                                 int tmpOffset = 0;
                                 int bytesToWrite = data.length;
                                 while (bytesToWrite > 0) {
                                     int tmpLength = Math.min(bytesToWrite, maxTxPacketSize);
-                                    int delay = tmpLength / 16;
                                     writeStream.write(data, tmpOffset, tmpLength);
                                     tmpOffset += tmpLength;
                                     updatePrintingProgress(data.length, tmpOffset);
                                     bytesToWrite -= tmpLength;
-                                    Thread.sleep(delay);
                                 }
+
+                                // req get printer status
+                                writeStream.write(new byte[]{29, 73, 1});
                                 writeStream.flush();
+
+                                // ensure data already processed
+                                byte[] buffer = new byte[1024];
+                                int ln = inputStream.read(buffer);
+                                Log.d("FlutterBluetoothPrinter", "print done");
+
                                 updatePrintingProgress(data.length, data.length);
-                                // waiting for printing completed
-                                int waitTime = data.length/16;
-                                Thread.sleep(waitTime);
+
+                                inputStream.close();
                                 writeStream.close();
 
                                 mainThread.post(() -> {
@@ -407,8 +417,6 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
         return false;
     }
-
-    private final Map<Object, EventChannel.EventSink> sinkList = new HashMap<>();
 
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
