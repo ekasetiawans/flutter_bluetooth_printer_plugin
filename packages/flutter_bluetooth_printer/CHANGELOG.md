@@ -1,3 +1,7 @@
+## 2.16.1
+
+ - **FIX**: clear buffers before printing.
+
 ## 2.16.0
 
  - **FEAT**: improve connection.
