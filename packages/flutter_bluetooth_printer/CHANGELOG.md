@@ -1,3 +1,7 @@
+## 2.16.3
+
+ - **FIX**: print image in chunks.
+
 ## 2.16.2
 
  - **FIX**: reduce dot per lines.
