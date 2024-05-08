@@ -1,3 +1,7 @@
+## 2.16.4
+
+ - **FIX**: ios and android print.
+
 ## 2.16.3
 
  - **FIX**: print image in chunks.
