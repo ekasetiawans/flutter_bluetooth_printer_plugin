@@ -1,3 +1,7 @@
+## 2.16.2
+
+ - **FIX**: reduce dot per lines.
+
 ## 2.16.1
 
  - **FIX**: clear buffers before printing.

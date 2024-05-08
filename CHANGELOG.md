@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.16.2`](#flutter_bluetooth_printer---v2162)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.16.2`
+
+ - **FIX**: reduce dot per lines.
+
+
+## 2024-05-08
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.16.1`](#flutter_bluetooth_printer---v2161)
 
 ---
