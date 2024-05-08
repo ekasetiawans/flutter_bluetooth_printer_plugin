@@ -56,12 +56,11 @@ class Generator {
       src,
       width: dotsPerLine,
       maintainAspect: true,
+      interpolation: img.Interpolation.cubic,
     );
 
     final int widthPx = src.width;
     final int heightPx = src.height;
-    final int widthBytes = widthPx ~/ 8;
-
     final list = _toRasterFormat(src);
 
     const int densityByte = 0;
@@ -69,8 +68,23 @@ class Generator {
       ...cRasterImg2.codeUnits,
     ];
     header.add(densityByte);
-    header.addAll(_intLowHigh(widthBytes, 2)); // xL xH
-    header.addAll(_intLowHigh(heightPx, 2)); // yL yH
+    List<int> xLxH = [
+      widthPx % 2048 ~/ 8,
+      widthPx ~/ 2048,
+    ];
+
+    List<int> yLyH = [
+      heightPx % 256,
+      heightPx ~/ 256,
+    ];
+
+    int k = (xLxH[0] + xLxH[1] * 256) * (yLyH[0] + yLyH[1] * 256);
+    if (k != list.length) {
+      throw 'Error';
+    }
+
+    header.addAll(xLxH); // xL xH
+    header.addAll(yLyH); // yL yH
 
     return <int>[
       ...header,
