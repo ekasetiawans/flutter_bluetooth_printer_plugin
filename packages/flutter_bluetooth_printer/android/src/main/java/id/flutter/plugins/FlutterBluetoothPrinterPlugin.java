@@ -270,7 +270,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                 maxTxPacketSize = call.argument("max_buffer_size");
                             }
 
-                            BluetoothSocket bluetoothSocket = connectedDevices.remove(address);
+                            BluetoothSocket bluetoothSocket = connectedDevices.get(address);
                             if (bluetoothSocket == null) {
                                 final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
                                 UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
@@ -315,8 +315,10 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
                                 updatePrintingProgress(data.length, data.length);
 
-                                inputStream.close();
-                                writeStream.close();
+                                if (!keepConnected) {
+                                    inputStream.close();
+                                    writeStream.close();
+                                }
 
                                 mainThread.post(() -> {
                                     // COMPLETED
@@ -328,6 +330,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                             } finally {
                                 if (!keepConnected) {
                                     bluetoothSocket.close();
+                                    connectedDevices.remove(address);
                                 }
                             }
                         } catch (Exception e) {

@@ -3,6 +3,7 @@ library flutter_bluetooth_printer;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

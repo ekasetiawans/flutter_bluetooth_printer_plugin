@@ -57,7 +57,7 @@ class FlutterBluetoothPrinter {
     );
   }
 
-  static Future<bool> printImage({
+  static Future<bool> xprintImage({
     required String address,
     required Uint8List imageBytes,
     required int imageWidth,
@@ -89,6 +89,86 @@ class FlutterBluetoothPrinter {
       data: Uint8List.fromList([
         ...reset,
         ...imageData,
+        ...reset,
+        ...additional,
+      ]),
+      onProgress: onProgress,
+      maxBufferSize: maxBufferSize,
+      delayTime: delayTime,
+    );
+  }
+
+  static Future<bool> printImage({
+    required String address,
+    required Uint8List imageBytes,
+    required int imageWidth,
+    required int imageHeight,
+    PaperSize paperSize = PaperSize.mm58,
+    ProgressCallback? onProgress,
+    int addFeeds = 0,
+    bool useImageRaster = true,
+    required bool keepConnected,
+    int maxBufferSize = 512,
+    int delayTime = 120,
+  }) async {
+    var src = img.decodePng(imageBytes);
+    if (src == null) {
+      return false;
+    }
+
+    src = img.grayscale(src);
+    src = img.copyResize(
+      src,
+      width: paperSize.width,
+      maintainAspect: true,
+      interpolation: img.Interpolation.cubic,
+    );
+
+    final totalHeight = src.height;
+    final lineHeight = paperSize.width;
+
+    final generator = Generator();
+    final reset = generator.reset();
+
+    final chunks = (totalHeight.toDouble() / lineHeight.toDouble()).ceil();
+    for (int i = 0; i < chunks; i++) {
+      final croppedImg = img.copyCrop(
+        src,
+        x: 0,
+        y: i * lineHeight,
+        width: src.width,
+        height: math.min(lineHeight, totalHeight - i * 8),
+      );
+
+      final imageData = await generator.rasterImage(
+        bytes: img.encodePng(croppedImg),
+        dotsPerLine: paperSize.width,
+      );
+
+      final result = await printBytes(
+        keepConnected: true,
+        address: address,
+        data: Uint8List.fromList([
+          ...reset,
+          ...imageData,
+        ]),
+        maxBufferSize: 4096,
+        delayTime: 0,
+      );
+
+      if (!result) {
+        return false;
+      }
+    }
+
+    final additional = <int>[
+      for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
+    ];
+
+    return printBytes(
+      keepConnected: keepConnected,
+      address: address,
+      data: Uint8List.fromList([
         ...reset,
         ...additional,
       ]),
