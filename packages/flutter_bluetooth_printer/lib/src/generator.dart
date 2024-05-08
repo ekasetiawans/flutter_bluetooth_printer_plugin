@@ -50,7 +50,7 @@ class Generator {
     required Uint8List bytes,
     required int dotsPerLine,
   }) async {
-    img.Image src = img.decodePng(bytes)!;
+    img.Image src = img.decodeJpg(bytes)!;
     src = img.grayscale(src);
     src = img.copyResize(
       src,
@@ -60,7 +60,9 @@ class Generator {
     );
 
     final int widthPx = src.width;
+    final int widthBytes = widthPx ~/ 8;
     final int heightPx = src.height;
+
     final list = _toRasterFormat(src);
 
     const int densityByte = 0;
@@ -68,23 +70,8 @@ class Generator {
       ...cRasterImg2.codeUnits,
     ];
     header.add(densityByte);
-    List<int> xLxH = [
-      widthPx % 2048 ~/ 8,
-      widthPx ~/ 2048,
-    ];
-
-    List<int> yLyH = [
-      heightPx % 256,
-      heightPx ~/ 256,
-    ];
-
-    int k = (xLxH[0] + xLxH[1] * 256) * (yLyH[0] + yLyH[1] * 256);
-    if (k != list.length) {
-      throw 'Error';
-    }
-
-    header.addAll(xLxH); // xL xH
-    header.addAll(yLyH); // yL yH
+    header.addAll(_intLowHigh(widthBytes, 2)); // xL xH
+    header.addAll(_intLowHigh(heightPx, 2));
 
     return <int>[
       ...header,

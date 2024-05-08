@@ -155,16 +155,33 @@ class ReceiptState extends State<Receipt> {
     int maxBufferSize = 512,
     int delayTime = 120,
   }) async {
-    final screenWidth = MediaQuery.of(context).size.width;
-    double quality = _paperSize.width / screenWidth;
-
     final RenderRepaintBoundary boundary =
         _localKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+
+    final screenWidth = boundary.size.width;
+    double quality = _paperSize.width / screenWidth;
+
     final image = await boundary.toImage(pixelRatio: quality);
     final byteData = await image.toByteData(format: ImageByteFormat.png);
-    final bytes = byteData!.buffer.asUint8List();
+    var bytes = byteData!.buffer.asUint8List();
+    bytes = img.encodeJpg(img.decodePng(bytes)!);
 
-    return FlutterBluetoothPrinter.printImage(
+    if (Platform.isIOS) {
+      return FlutterBluetoothPrinter.printImageSingle(
+        address: address,
+        imageBytes: bytes,
+        imageWidth: image.width,
+        imageHeight: image.height,
+        paperSize: _paperSize,
+        onProgress: onProgress,
+        addFeeds: addFeeds,
+        keepConnected: keepConnected,
+        maxBufferSize: bytes.length,
+        delayTime: delayTime,
+      );
+    }
+
+    return FlutterBluetoothPrinter.printImageChunks(
       address: address,
       imageBytes: bytes,
       imageWidth: image.width,
@@ -175,6 +192,24 @@ class ReceiptState extends State<Receipt> {
       keepConnected: keepConnected,
       maxBufferSize: bytes.length,
       delayTime: delayTime,
+    );
+  }
+}
+
+class _ImagePreviewForDebug extends StatelessWidget {
+  final Uint8List bytes;
+  const _ImagePreviewForDebug({
+    super.key,
+    required this.bytes,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Image Preview'),
+      ),
+      body: Image.memory(bytes),
     );
   }
 }

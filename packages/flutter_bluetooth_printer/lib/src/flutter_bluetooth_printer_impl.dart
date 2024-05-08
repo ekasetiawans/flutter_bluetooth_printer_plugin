@@ -57,7 +57,7 @@ class FlutterBluetoothPrinter {
     );
   }
 
-  static Future<bool> xprintImage({
+  static Future<bool> printImageSingle({
     required String address,
     required Uint8List imageBytes,
     required int imageWidth,
@@ -98,7 +98,7 @@ class FlutterBluetoothPrinter {
     );
   }
 
-  static Future<bool> printImage({
+  static Future<bool> printImageChunks({
     required String address,
     required Uint8List imageBytes,
     required int imageWidth,
@@ -111,7 +111,7 @@ class FlutterBluetoothPrinter {
     int maxBufferSize = 512,
     int delayTime = 120,
   }) async {
-    var src = img.decodePng(imageBytes);
+    var src = img.decodeJpg(imageBytes);
     if (src == null) {
       return false;
     }
@@ -141,7 +141,7 @@ class FlutterBluetoothPrinter {
       );
 
       final imageData = await generator.rasterImage(
-        bytes: img.encodePng(croppedImg),
+        bytes: img.encodeJpg(croppedImg),
         dotsPerLine: paperSize.width,
       );
 
