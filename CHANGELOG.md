@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.16.6`](#flutter_bluetooth_printer---v2166)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.16.6`
+
+ - **FIX**: obsolete printer status.
+
+
+## 2024-05-09
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.16.5`](#flutter_bluetooth_printer---v2165)
 
 ---

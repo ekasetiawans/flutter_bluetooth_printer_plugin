@@ -1,3 +1,7 @@
+## 2.16.6
+
+ - **FIX**: obsolete printer status.
+
 ## 2.16.5
 
  - **FIX**: revert to printImageSingle instead of splits image into chunks.
