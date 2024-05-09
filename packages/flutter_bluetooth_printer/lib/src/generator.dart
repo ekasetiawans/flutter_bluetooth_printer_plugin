@@ -50,14 +50,19 @@ class Generator {
     required Uint8List bytes,
     required int dotsPerLine,
   }) async {
-    img.Image src = img.decodeJpg(bytes)!;
-    src = img.grayscale(src);
+    // need to convert to JPG
+    // iOS issue, when using PNG the output is broken
+
+    final newBytes = img.encodeJpg(img.decodePng(bytes)!);
+    img.Image src = img.decodeJpg(newBytes)!;
     src = img.copyResize(
       src,
       width: dotsPerLine,
       maintainAspect: true,
+      backgroundColor: img.ColorRgba8(255, 255, 255, 255),
       interpolation: img.Interpolation.cubic,
     );
+    src = img.grayscale(src);
 
     final int widthPx = src.width;
     final int widthBytes = widthPx ~/ 8;

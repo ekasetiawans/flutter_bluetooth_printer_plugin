@@ -127,14 +127,7 @@ class MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
       _isBusy = true;
       _init();
 
-      // ensure device is available
-      await discovery
-          .firstWhere((element) =>
-              element is BluetoothDevice && element.address == address)
-          .timeout(const Duration(seconds: 10));
-
       _progressCallback = onProgress;
-
       final res = await channel.invokeMethod('write', {
         'address': address,
         'data': data,
@@ -169,17 +162,34 @@ class MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
     return false;
   }
 
+  bool _alreadyDiscovered = false;
+
   @override
   Future<bool> connect(String address) async {
-    final res = await channel.invokeMethod('connect', {
-      'address': address,
-    });
+    try {
+      _isBusy = true;
+      _init();
 
-    if (res is bool) {
-      return res;
+      if (!_alreadyDiscovered) {
+        await discovery
+            .firstWhere((element) =>
+                element is BluetoothDevice && element.address == address)
+            .timeout(const Duration(seconds: 10));
+        _alreadyDiscovered = true;
+      }
+
+      final res = await channel.invokeMethod('connect', {
+        'address': address,
+      });
+
+      if (res is bool) {
+        return res;
+      }
+
+      return false;
+    } finally {
+      _isBusy = false;
     }
-
-    return false;
   }
 
   @override

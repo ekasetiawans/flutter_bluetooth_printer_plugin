@@ -70,32 +70,56 @@ class FlutterBluetoothPrinter {
     int maxBufferSize = 512,
     int delayTime = 120,
   }) async {
-    final generator = Generator();
-    final reset = generator.reset();
+    try {
+      final generator = Generator();
+      final reset = generator.reset();
 
-    final imageData = await generator.encode(
-      bytes: imageBytes,
-      dotsPerLine: paperSize.width,
-      useImageRaster: useImageRaster,
-    );
+      final isConnected = await connect(address);
+      if (!isConnected) {
+        return false;
+      }
 
-    final additional = <int>[
-      for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
-    ];
+      await printBytes(
+        address: address,
+        data: Uint8List.fromList(reset),
+        keepConnected: true,
+      );
 
-    return printBytes(
-      keepConnected: keepConnected,
-      address: address,
-      data: Uint8List.fromList([
-        ...reset,
-        ...imageData,
-        ...reset,
-        ...additional,
-      ]),
-      onProgress: onProgress,
-      maxBufferSize: maxBufferSize,
-      delayTime: delayTime,
-    );
+      final res = await Future.wait([
+        generator.encode(
+          bytes: imageBytes,
+          dotsPerLine: paperSize.width,
+          useImageRaster: useImageRaster,
+        ),
+        // wait for printer buffer cleared by ESC @
+        Future.delayed(const Duration(milliseconds: 200)),
+      ]);
+
+      final imageData = res[0];
+      final additional = <int>[
+        for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
+      ];
+
+      await printBytes(
+        keepConnected: true,
+        address: address,
+        data: Uint8List.fromList([
+          ...imageData,
+          ...reset,
+          ...additional,
+        ]),
+        onProgress: onProgress,
+        maxBufferSize: maxBufferSize,
+        delayTime: delayTime,
+      );
+
+      if (!keepConnected) {
+        await disconnect(address);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   static Future<bool> printImageChunks({

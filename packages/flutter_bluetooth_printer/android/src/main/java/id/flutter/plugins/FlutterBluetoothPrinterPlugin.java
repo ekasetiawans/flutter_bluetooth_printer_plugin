@@ -211,6 +211,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                         }
                     }
                 }).start();
+                return;
             }
             case "getState": {
                 if (!ensurePermission(false)) {
@@ -290,9 +291,13 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                 mainThread.post(() -> channel.invokeMethod("didUpdateState", 2));
                                 assert data != null;
 
+                                updatePrintingProgress(data.length, 0);
+
                                 // req get printer status
                                 writeStream.write(data);
                                 writeStream.flush();
+
+                                updatePrintingProgress(data.length, data.length);
 
                                 // request printer status
                                 // GS r
