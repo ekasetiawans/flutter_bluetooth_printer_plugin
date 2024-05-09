@@ -1,3 +1,8 @@
+## 2.16.7
+
+ - **FIX**: Android crash on call connect().
+ - **FIX**: iOS connect return false even it's connected.
+
 ## 2.16.6
 
  - **FIX**: obsolete printer status.

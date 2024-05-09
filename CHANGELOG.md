@@ -15,6 +15,28 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.16.7`](#flutter_bluetooth_printer---v2167)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.16.7`
+
+ - **FIX**: Android crash on call connect().
+ - **FIX**: iOS connect return false even it's connected.
+
+
+## 2024-05-09
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.16.6`](#flutter_bluetooth_printer---v2166)
 
 ---
