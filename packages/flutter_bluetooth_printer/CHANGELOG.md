@@ -1,3 +1,8 @@
+## 2.16.5
+
+ - **FIX**: revert to printImageSingle instead of splits image into chunks.
+ - **FIX**: crash when turn on bluetooth on android.
+
 ## 2.16.4
 
  - **FIX**: ios and android print.
