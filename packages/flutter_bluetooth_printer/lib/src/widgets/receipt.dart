@@ -166,22 +166,7 @@ class ReceiptState extends State<Receipt> {
     var bytes = byteData!.buffer.asUint8List();
     bytes = img.encodeJpg(img.decodePng(bytes)!);
 
-    if (Platform.isIOS) {
-      return FlutterBluetoothPrinter.printImageSingle(
-        address: address,
-        imageBytes: bytes,
-        imageWidth: image.width,
-        imageHeight: image.height,
-        paperSize: _paperSize,
-        onProgress: onProgress,
-        addFeeds: addFeeds,
-        keepConnected: keepConnected,
-        maxBufferSize: bytes.length,
-        delayTime: delayTime,
-      );
-    }
-
-    return FlutterBluetoothPrinter.printImageChunks(
+    return FlutterBluetoothPrinter.printImageSingle(
       address: address,
       imageBytes: bytes,
       imageWidth: image.width,
