@@ -131,7 +131,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 if(activity == null){
                     return false;
                 }
-                
+
                 boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
                 boolean fineLocation = activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
                 boolean coarseLocation = activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -269,10 +269,6 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                             String address = call.argument("address");
                             boolean keepConnected = call.argument("keep_connected");
                             byte[] data = call.argument("data");
-                            int maxTxPacketSize = 512;
-                            if (call.hasArgument("max_buffer_size")) {
-                                maxTxPacketSize = call.argument("max_buffer_size");
-                            }
 
                             BluetoothSocket bluetoothSocket = connectedDevices.get(address);
                             if (bluetoothSocket == null) {
@@ -290,32 +286,24 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                                 InputStream inputStream = bluetoothSocket.getInputStream();
                                 OutputStream writeStream = bluetoothSocket.getOutputStream();
 
-                                // req clear buffers
-                                writeStream.write(new byte[]{16, 20, 8, 1, 3, 20, 1, 6, 2, 8});
-
                                 // PRINTING
                                 mainThread.post(() -> channel.invokeMethod("didUpdateState", 2));
                                 assert data != null;
-                                updatePrintingProgress(data.length, 0);
-
-                                int tmpOffset = 0;
-                                int bytesToWrite = data.length;
-                                while (bytesToWrite > 0) {
-                                    int tmpLength = Math.min(bytesToWrite, maxTxPacketSize);
-                                    writeStream.write(data, tmpOffset, tmpLength);
-                                    tmpOffset += tmpLength;
-                                    updatePrintingProgress(data.length, tmpOffset);
-                                    bytesToWrite -= tmpLength;
-                                }
 
                                 // req get printer status
-                                writeStream.write(new byte[]{29, 73, 1});
+                                writeStream.write(data);
                                 writeStream.flush();
 
-                                // ensure data already processed
+                                // request printer status
+                                // GS r
+                                writeStream.write(new byte[]{0x1D, 0x72, 0x1});
+                                writeStream.flush();
+
+                                // read printer response
+                                // if printer reply a response, that means data already printed
                                 byte[] buffer = new byte[1024];
                                 int ln = inputStream.read(buffer);
-                                Log.d("FlutterBluetoothPrinter", "print done");
+                                Log.d("FlutterBluetoothPrinter", "print done :" +String.valueOf(ln));
 
                                 updatePrintingProgress(data.length, data.length);
 
