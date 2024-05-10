@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-05-10
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.16.8`](#flutter_bluetooth_printer---v2168)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.16.8`
+
+ - **FIX**: print image.
+
+
 ## 2024-05-09
 
 ### Changes

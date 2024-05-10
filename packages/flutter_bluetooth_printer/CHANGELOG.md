@@ -1,3 +1,7 @@
+## 2.16.8
+
+ - **FIX**: print image.
+
 ## 2.16.7
 
  - **FIX**: Android crash on call connect().
