@@ -155,12 +155,7 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
             return;
         }
 
-        if (bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.cancelDiscovery();
-        }
-
-        bluetoothAdapter.startDiscovery();
-
+        // immediately return bonded devices
         Set<BluetoothDevice> bonded = bluetoothAdapter.getBondedDevices();
         for (BluetoothDevice device : bonded) {
             final Map<String, Object> map = deviceToMap(device);
@@ -168,6 +163,13 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                 sink.success(map);
             }
         }
+
+
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
+
+        bluetoothAdapter.startDiscovery();
     }
 
     private void stopDiscovery() {
