@@ -1,3 +1,7 @@
+## 2.16.10
+
+ - **FIX**: android connectivity.
+
 ## 2.16.9
 
  - **FIX**: calculate waiting time based on data size on android.

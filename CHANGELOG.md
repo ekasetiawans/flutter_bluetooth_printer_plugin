@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.16.10`](#flutter_bluetooth_printer---v21610)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.16.10`
+
+ - **FIX**: android connectivity.
+
+
+## 2024-05-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.16.9`](#flutter_bluetooth_printer---v2169)
 
 ---
