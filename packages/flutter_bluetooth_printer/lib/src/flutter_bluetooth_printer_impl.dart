@@ -59,6 +59,28 @@ class FlutterBluetoothPrinter {
     );
   }
 
+  static double calculatePrintingDurationInMilliseconds(
+    int heightInDots,
+    double printSpeed,
+    int dotsPerLine,
+    double paperWidth,
+    int dotsPerLineHeight,
+  ) {
+    // Calculate the number of lines
+    double numberOfLines = heightInDots / dotsPerLineHeight;
+
+    // Calculate lines per second
+    double linesPerSecond = printSpeed / paperWidth;
+
+    // Calculate the duration in seconds
+    double durationSeconds = numberOfLines / linesPerSecond;
+
+    // Convert the duration to milliseconds
+    double durationMilliseconds = durationSeconds * 1000;
+
+    return durationMilliseconds;
+  }
+
   static Future<bool> printImageSingle({
     required String address,
     required Uint8List imageBytes,
@@ -92,6 +114,7 @@ class FlutterBluetoothPrinter {
       final additional = <int>[
         for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
       ];
+
       final printResult = await printBytes(
         keepConnected: true,
         address: address,
@@ -104,11 +127,6 @@ class FlutterBluetoothPrinter {
         maxBufferSize: maxBufferSize,
         delayTime: delayTime,
       );
-
-      if (Platform.isAndroid) {
-        final waitingTime = imageData.length / 8;
-        await Future.delayed(Duration(milliseconds: 1000 + waitingTime.ceil()));
-      }
 
       return printResult;
     } catch (e) {
