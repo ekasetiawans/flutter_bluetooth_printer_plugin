@@ -301,19 +301,6 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
 
                                 updatePrintingProgress(data.length, data.length);
 
-                                // request printer status
-                                // GS r
-                                writeStream.write(new byte[]{0x1D, 0x72, 0x1});
-                                writeStream.flush();
-
-                                // read printer response
-                                // if printer reply a response, that means data already printed
-                                byte[] buffer = new byte[1024];
-                                int ln = inputStream.read(buffer);
-                                Log.d("FlutterBluetoothPrinter", "print done :" +String.valueOf(ln));
-
-                                updatePrintingProgress(data.length, data.length);
-
                                 if (!keepConnected) {
                                     inputStream.close();
                                     writeStream.close();

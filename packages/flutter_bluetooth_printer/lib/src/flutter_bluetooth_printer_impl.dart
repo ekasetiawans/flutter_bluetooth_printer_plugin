@@ -7,12 +7,14 @@ class DiscoveryResult extends DiscoveryState {
 
 enum PaperSize {
   // original is 384 => 48 * 8
-  mm58(360, 'Roll Paper 58mm');
+  mm58(360, 58, 'Roll Paper 58mm');
 
   final int width;
+  final double paperWidthMM;
   final String name;
   const PaperSize(
     this.width,
+    this.paperWidthMM,
     this.name,
   );
 }
@@ -84,11 +86,13 @@ class FlutterBluetoothPrinter {
         address: address,
       );
 
+      // waiting for printer initialized and buffers cleared
+      await Future.delayed(const Duration(milliseconds: 400));
+
       final additional = <int>[
         for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
       ];
-
-      return await printBytes(
+      final printResult = await printBytes(
         keepConnected: true,
         address: address,
         data: Uint8List.fromList([
@@ -100,6 +104,13 @@ class FlutterBluetoothPrinter {
         maxBufferSize: maxBufferSize,
         delayTime: delayTime,
       );
+
+      if (Platform.isAndroid) {
+        final waitingTime = imageData.length / 8;
+        await Future.delayed(Duration(milliseconds: 1000 + waitingTime.ceil()));
+      }
+
+      return printResult;
     } catch (e) {
       return false;
     } finally {
