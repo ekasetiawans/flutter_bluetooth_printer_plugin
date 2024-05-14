@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-05-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.16.9`](#flutter_bluetooth_printer---v2169)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.16.9`
+
+ - **FIX**: calculate waiting time based on data size on android.
+
+
 ## 2024-05-10
 
 ### Changes

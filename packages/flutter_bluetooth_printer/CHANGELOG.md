@@ -1,3 +1,7 @@
+## 2.16.9
+
+ - **FIX**: calculate waiting time based on data size on android.
+
 ## 2.16.8
 
  - **FIX**: print image.
