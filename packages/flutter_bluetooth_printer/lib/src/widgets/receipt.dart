@@ -3,7 +3,7 @@ part of flutter_bluetooth_printer;
 class ReceiptController with ChangeNotifier {
   final ReceiptState _state;
 
-  PaperSize _paperSize = PaperSize.mm58;
+  late PaperSize _paperSize; // = PaperSize.mm58;
   PaperSize get paperSize => _paperSize;
   set paperSize(PaperSize size) {
     _paperSize = size;
@@ -12,7 +12,9 @@ class ReceiptController with ChangeNotifier {
 
   ReceiptController._({
     required ReceiptState state,
-  }) : _state = state;
+    required PaperSize paperSize,
+  })  : _state = state,
+        _paperSize = paperSize;
 
   Future<bool> print({
     required String address,
@@ -40,6 +42,7 @@ class Receipt extends StatefulWidget {
   final Widget Function(BuildContext context, Widget child)? containerBuilder;
   final Color backgroundColor;
   final TextStyle? defaultTextStyle;
+  final PaperSize paperSize;
   final void Function(ReceiptController controller) onInitialized;
 
   const Receipt({
@@ -48,6 +51,7 @@ class Receipt extends StatefulWidget {
     this.backgroundColor = Colors.grey,
     required this.builder,
     required this.onInitialized,
+    required this.paperSize,
     this.containerBuilder,
   }) : super(key: key);
 
@@ -57,13 +61,14 @@ class Receipt extends StatefulWidget {
 
 class ReceiptState extends State<Receipt> {
   final _localKey = GlobalKey();
-  PaperSize _paperSize = PaperSize.mm58;
+  late PaperSize _paperSize;
   late ReceiptController controller;
 
   @override
   void initState() {
     super.initState();
-    controller = ReceiptController._(state: this);
+    _paperSize = widget.paperSize;
+    controller = ReceiptController._(state: this, paperSize: _paperSize);
     controller.addListener(_listener);
     Future.delayed(const Duration(milliseconds: 100), () {
       widget.onInitialized(controller);
