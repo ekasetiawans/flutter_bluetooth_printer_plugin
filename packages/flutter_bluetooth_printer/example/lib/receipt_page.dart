@@ -38,6 +38,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
           Expanded(
             child: Receipt(
               backgroundColor: Colors.grey.shade200,
+              paperSize: MyPapperSize(560, 80, 'Paper 80mm'),
               builder: (context) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -178,6 +179,17 @@ class _ReceiptPageState extends State<ReceiptPage> {
       ),
     );
   }
+}
+
+class MyPapperSize extends PaperSize {
+  @override
+  final int width;
+  @override
+  final double paperWidthMM;
+  @override
+  final String name;
+
+  MyPapperSize(this.width, this.paperWidthMM, this.name);
 }
 
 class PrintingProgressDialog extends StatefulWidget {
