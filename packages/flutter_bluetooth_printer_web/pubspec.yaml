@@ -1,0 +1,38 @@
+name: flutter_bluetooth_printer_web
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ^3.5.3
+  flutter: ">=1.17.0"
+
+
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+    
+  flutter_bluetooth_printer_platform_interface: ^0.0.7
+  plugin_platform_interface: ^2.1.2
+  web: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+  plugin:
+    implements: flutter_bluetooth_printer
+    platforms:
+      web:
+        pluginClass: FlutterBluetoothWebJSChannel
+        fileName: flutter_bluetooth_printer_web.dart
