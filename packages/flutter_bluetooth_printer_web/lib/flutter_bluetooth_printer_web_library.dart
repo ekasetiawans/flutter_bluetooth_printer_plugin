@@ -16,4 +16,6 @@ part 'interops/bluetooth_device_gatt.dart';
 part 'interops/bluetooth_device_result.dart';
 part 'interops/advertisement_js_result.dart';
 part 'interops/le_scan_request.dart';
+part 'peripherals/bluetooth_discovery_manual.dart';
+part 'peripherals/web_blueooth_dart_device.dart';
 part 'peripherals/flutter_bluetooth_web_js_channel.dart';

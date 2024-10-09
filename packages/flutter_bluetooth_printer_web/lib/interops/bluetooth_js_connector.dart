@@ -13,6 +13,8 @@ extension type Bluetooth._(JSObject _) implements web.EventTarget, JSObject {
 
   external JSPromise<WebBluetoothDevice> requestDevice(RequestDeviceJS options);
 
+  external JSPromise<JSArray<WebBluetoothDevice>> getDevices();
+
   external web.EventHandler get advertisementreceived;
   external set advertisementreceived(web.EventHandler value);
 
