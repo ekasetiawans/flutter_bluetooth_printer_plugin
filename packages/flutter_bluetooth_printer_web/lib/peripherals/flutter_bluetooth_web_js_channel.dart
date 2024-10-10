@@ -40,16 +40,11 @@ class FlutterBluetoothWebJSChannel extends FlutterBluetoothPrinterPlatform {
   }
 
   @override
-  Future<bool> connect(String address) {
-    // TODO: implement connect
-    throw UnimplementedError();
-  }
+  Future<bool> connect(String address) => _discoveryManual.connect(address);
 
   @override
-  Future<bool> disconnect(String address) {
-    // TODO: implement disconnect
-    throw UnimplementedError();
-  }
+  Future<bool> disconnect(String address) =>
+      _discoveryManual.disconnect(address);
 
   @override
   Stream<DiscoveryState> get discovery => _discoveryManual.discover();
@@ -62,8 +57,13 @@ class FlutterBluetoothWebJSChannel extends FlutterBluetoothPrinterPlatform {
     required int maxBufferSize,
     required int delayTime,
     ProgressCallback? onProgress,
-  }) {
-    // TODO: implement write
-    throw UnimplementedError();
-  }
+  }) =>
+      _discoveryManual.write(
+        address: address,
+        data: data,
+        keepConnected: keepConnected,
+        maxBufferSize: maxBufferSize,
+        delayTime: delayTime,
+        onProgress: onProgress,
+      );
 }
