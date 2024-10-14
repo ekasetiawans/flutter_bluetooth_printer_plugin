@@ -1,4 +1,4 @@
-part of '../flutter_bluetooth_printer_web_library.dart';
+part of flutter_bluetooth_printer_web;
 
 extension type LEScanResult._(JSObject _) implements JSObject {
   external JSBoolean get active;

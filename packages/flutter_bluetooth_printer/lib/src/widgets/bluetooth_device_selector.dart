@@ -44,46 +44,39 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
 
               final data = snapshot.data;
 
-              if (data is UnsupportedBluetoothState ||
-                  data is WebUnsupportedBluetoothState) {
+              if (data is UnsupportedBluetoothState) {
                 return widget.unsupportedWidget ??
                     const Center(
                       child: Text('Bluetooth is not supported'),
                     );
               }
 
-              if (data is BluetoothDisabledState ||
-                  data is WebBluetoothDisabledState) {
+              if (data is BluetoothDisabledState) {
                 return widget.disabledWidget ??
                     const Center(
                       child: Text('Bluetooth is disabled'),
                     );
               }
 
-              if (data is PermissionRestrictedState ||
-                  data is WebPermissionRestrictedState) {
+              if (data is PermissionRestrictedState) {
                 return widget.permissionRestrictedWidget ??
                     const Center(
                       child: Text('Bluetooth is not permitted'),
                     );
               }
 
-              if (data is BluetoothEnabledState ||
-                  data is WebBluetoothEnabledState) {
+              if (data is BluetoothEnabledState) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (data is WebUnknownState || data is UnknownState) {
+              if (data is UnknownState) {
                 return const Center(
                   child: Text('Unknown Result'),
                 );
               }
 
-              final devices = data is DiscoveryResult
-                  ? data.devices
-                  : data is WebDiscoveryResult
-                      ? data.devices
-                      : [];
+              final List<BluetoothDevice> devices =
+                  data is DiscoveryResult ? data.devices : [];
               return ListView.builder(
                 itemCount: devices.length,
                 itemBuilder: (context, index) {

@@ -1,4 +1,4 @@
-part of '../flutter_bluetooth_printer_web_library.dart';
+part of flutter_bluetooth_printer_web;
 
 /// Type of CharacteristicProperties .
 /// See : https://developer.mozilla.org/en-US/docs/Web/API/BluetoothCharacteristicProperties

@@ -1,3 +1,5 @@
+library flutter_bluetooth_printer_web;
+
 // import 'web';
 import 'dart:async';
 import 'dart:js_interop';

@@ -1,4 +1,4 @@
-part of '../flutter_bluetooth_printer_web_library.dart';
+part of flutter_bluetooth_printer_web;
 
 extension BluetoothNavEx on web.Navigator {
   external Bluetooth get bluetooth;

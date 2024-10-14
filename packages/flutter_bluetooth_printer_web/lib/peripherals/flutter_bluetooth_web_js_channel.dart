@@ -30,7 +30,7 @@ class FlutterBluetoothWebJSChannel extends FlutterBluetoothPrinterPlatform {
   // isInitialized will be stored in sessionStorage or localStorage in the near future .
   bool isInitialized = false;
 
-  static void registerWith(Registrar registrat) {
+  static void registerWith(Registrar registrar) {
     FlutterBluetoothPrinterPlatform.instance = FlutterBluetoothWebJSChannel();
   }
 

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_printer_platform_interface/flutter_bluetooth_printer_platform_interface.dart';
-import 'package:flutter_bluetooth_printer_web/flutter_bluetooth_printer_web.dart';
 import 'package:image/image.dart' as img;
 import 'package:image/image.dart' hide Image, Color;
 

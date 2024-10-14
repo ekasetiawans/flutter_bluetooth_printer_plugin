@@ -1,4 +1,4 @@
-part of '../flutter_bluetooth_printer_web_library.dart';
+part of flutter_bluetooth_printer_web;
 
 class BluetoothDiscoveryManual extends ChangeNotifier {
   BluetoothDiscoveryManual() {
@@ -52,7 +52,8 @@ class BluetoothDiscoveryManual extends ChangeNotifier {
       final len = data.length;
 
       // Buffer Size set to static because it's too long for web bluetooth to handle .
-      const bufferSize = 40;
+      // 256 is currently max bytes tested .
+      const bufferSize = 384;
       for (var i = 0; i < len; i += bufferSize) {
         var end = (i + bufferSize < len) ? i + bufferSize : len;
         chunks.add(data.sublist(i, end));
@@ -63,10 +64,13 @@ class BluetoothDiscoveryManual extends ChangeNotifier {
             .writeValueWithoutResponse(
               chunks[i].toJS,
             )
-            .toDart;
-        if (onProgress != null) {
-          onProgress.call(chunks.length, i);
-        }
+            .toDart
+            .then((v) {
+          if (onProgress != null) {
+            onProgress.call(chunks.length, i);
+          }
+        });
+
         await Future.delayed(
           // Delay using static method because delay from parameter is too long for Web platform to handle
           const Duration(
@@ -148,23 +152,26 @@ class BluetoothDiscoveryManual extends ChangeNotifier {
   ///
   /// https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth/getDevices#browser_compatibility
   Stream<WebBlueoothDartDevice> discover() async* {
-    if (!isInitialized) {
-      isInitialized = true;
-      final request = RequestDeviceJS(
-        acceptAllDevices: true.toJS,
-        optionalServices: [generalServiceUuid.toJS].toJS,
+    final request = RequestDeviceJS(
+      acceptAllDevices: true.toJS,
+      optionalServices: [generalServiceUuid.toJS].toJS,
+    );
+
+    WebBluetoothDevice? device;
+
+    try {
+      device = await _bluetooth.requestDevice(request).toDart;
+    } catch (e) {
+      debugPrint(e.toString());
+      device = null;
+    }
+
+    if (device != null) {
+      bool hasDevice = devices.any(
+        (element) => element.address == device!.id.toDart,
       );
 
-      WebBluetoothDevice? device;
-
-      try {
-        device = await _bluetooth.requestDevice(request).toDart;
-      } catch (e) {
-        debugPrint(e.toString());
-        device = null;
-      }
-
-      if (device != null) {
+      if (!hasDevice) {
         devices.add(
           WebBlueoothDartDevice(
             address: device.id.toDart,
@@ -173,19 +180,10 @@ class BluetoothDiscoveryManual extends ChangeNotifier {
           ),
         );
       }
-
-      yield* Stream.fromIterable(
-        devices,
-      );
-      return;
     }
 
-    try {
-      yield* Stream.fromIterable(
-        devices,
-      );
-    } catch (e) {
-      debugPrint(e.toString());
-    }
+    yield* Stream.fromIterable(
+      devices,
+    );
   }
 }

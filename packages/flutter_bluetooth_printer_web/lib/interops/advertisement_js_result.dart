@@ -1,4 +1,4 @@
-part of '../flutter_bluetooth_printer_web_library.dart';
+part of flutter_bluetooth_printer_web;
 
 extension type AdvertisementDeviceResult._(JSObject _)
     implements web.Event, JSObject {
