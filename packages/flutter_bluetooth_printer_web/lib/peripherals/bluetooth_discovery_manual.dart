@@ -52,24 +52,23 @@ class BluetoothDiscoveryManual extends ChangeNotifier {
       final len = data.length;
 
       // Buffer Size set to static because it's too long for web bluetooth to handle .
-      // 256 is currently max bytes tested .
-      const bufferSize = 384;
+      // 384 is currently max bytes tested .
+      const bufferSize = 256;
       for (var i = 0; i < len; i += bufferSize) {
         var end = (i + bufferSize < len) ? i + bufferSize : len;
         chunks.add(data.sublist(i, end));
       }
 
-      for (var i = 0; i < chunks.length; i += 1) {
+      for (var ix = 0; ix < chunks.length; ix++) {
         await characteristic
             .writeValueWithoutResponse(
-              chunks[i].toJS,
+              chunks[ix].toJS,
             )
-            .toDart
-            .then((v) {
-          if (onProgress != null) {
-            onProgress.call(chunks.length, i);
-          }
-        });
+            .toDart;
+        if (onProgress != null) {
+          onProgress.call(chunks.length, (ix + 1));
+          debugPrint('Sent : $ix, Total ${chunks.length}');
+        }
 
         await Future.delayed(
           // Delay using static method because delay from parameter is too long for Web platform to handle
