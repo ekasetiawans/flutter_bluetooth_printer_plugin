@@ -3,10 +3,12 @@ part of flutter_bluetooth_printer;
 class BluetoothDeviceSelector extends StatefulWidget {
   final Widget? disabledWidget;
   final Widget? permissionRestrictedWidget;
+  final Widget? unsupportedWidget;
   final Widget? title;
   const BluetoothDeviceSelector({
     Key? key,
     this.disabledWidget,
+    this.unsupportedWidget,
     this.permissionRestrictedWidget,
     this.title,
   }) : super(key: key);
@@ -42,6 +44,13 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
 
               final data = snapshot.data;
 
+              if (data is UnsupportedBluetoothState) {
+                return widget.unsupportedWidget ??
+                    const Center(
+                      child: Text('Bluetooth is not supported'),
+                    );
+              }
+
               if (data is BluetoothDisabledState) {
                 return widget.disabledWidget ??
                     const Center(
@@ -60,7 +69,14 @@ class _BluetoothDeviceSelectorState extends State<BluetoothDeviceSelector> {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final devices = (data as DiscoveryResult).devices;
+              if (data is UnknownState) {
+                return const Center(
+                  child: Text('Unknown Result'),
+                );
+              }
+
+              final List<BluetoothDevice> devices =
+                  data is DiscoveryResult ? data.devices : [];
               return ListView.builder(
                 itemCount: devices.length,
                 itemBuilder: (context, index) {
