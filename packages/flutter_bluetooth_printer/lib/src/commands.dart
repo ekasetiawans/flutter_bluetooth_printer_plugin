@@ -17,6 +17,7 @@ class Commands {
 
   // Paper Handling
   static const List<int> lineFeed = [0x0A];
+  static const List<int> carriageReturn = [0x0D];
   static const List<int> cutPaper = [0x1D, 0x56, 0x00];
   static const List<int> partialCutPaper = [0x1D, 0x56, 0x01];
 
