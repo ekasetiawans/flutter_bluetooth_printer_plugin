@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 
 class ReceiptPage extends StatefulWidget {
-  const ReceiptPage({Key? key}) : super(key: key);
+  const ReceiptPage({super.key});
 
   @override
   State<ReceiptPage> createState() => _ReceiptPageState();
@@ -159,7 +159,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                     context))
                                 ?.address;
 
-                        if (selectedAddress != null) {
+                        if (context.mounted && selectedAddress != null) {
                           PrintingProgressDialog.print(
                             context,
                             device: selectedAddress,
@@ -184,10 +184,10 @@ class PrintingProgressDialog extends StatefulWidget {
   final String device;
   final ReceiptController controller;
   const PrintingProgressDialog({
-    Key? key,
+    super.key,
     required this.device,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   State<PrintingProgressDialog> createState() => _PrintingProgressDialogState();
@@ -253,6 +253,8 @@ class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
               ElevatedButton(
                 onPressed: () async {
                   await FlutterBluetoothPrinter.disconnect(widget.device);
+
+                  if (!context.mounted) return;
                   Navigator.pop(context);
                 },
                 child: const Text('Disconnect'),
