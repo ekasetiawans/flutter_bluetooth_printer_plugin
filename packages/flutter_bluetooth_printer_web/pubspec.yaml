@@ -1,6 +1,6 @@
 name: flutter_bluetooth_printer_web
 description: "flutter_bluetooth_printer plugin support for web"
-version: 1.0.0
+version: 1.1.0
 repository: https://github.com/ekasetiawans/flutter_bluetooth_printer_plugin
 
 environment:

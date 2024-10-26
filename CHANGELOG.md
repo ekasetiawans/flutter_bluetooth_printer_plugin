@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-10-26
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.17.0`](#flutter_bluetooth_printer---v2170)
+ - [`flutter_bluetooth_printer_web` - `v1.1.0`](#flutter_bluetooth_printer_web---v110)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.17.0`
+
+ - **FIX**: melos.
+ - **FIX**(android): error cannot build because importing web platform .
+ - **FEAT**: added support web.
+ - **FEAT**(web): discovery and request LEScan finded .
+
+#### `flutter_bluetooth_printer_web` - `v1.1.0`
+
+ - **PERF**(docs): update readme.md.
+ - **FIX**: melos.
+ - **FIX**(web): printing finish, but onProgress stuck in the end.
+ - **FIX**(android): error cannot build because importing web platform .
+ - **FEAT**(web): write, connect and disconnect completed .
+ - **FEAT**(web): pairing and saved.
+ - **FEAT**(web): discovery get result, but still can't stop with periods .
+ - **FEAT**(web): discovery and request LEScan finded .
+
+
 ## 2024-05-14
 
 ### Changes
