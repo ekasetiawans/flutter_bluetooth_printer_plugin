@@ -103,7 +103,9 @@ class BluetoothDiscoveryManual extends ChangeNotifier {
     final device = selectedDevices.first;
 
     if (device.jsDevice.gatt.connected.toDart) {
-      throw Exception('Device is already connected');
+      // Forcing to return true rather than error for supporting some scenarios .
+      // throw Exception('Device is already connected');
+      return true;
     }
 
     await device.jsDevice.gatt.connect().toDart;
