@@ -1,3 +1,7 @@
+## 2.17.1
+
+ - **FIX**(web): Throw Error when connecting connected Device .
+
 ## 2.17.0
 
  - **FIX**: melos.

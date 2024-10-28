@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-10-28
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.17.1`](#flutter_bluetooth_printer---v2171)
+ - [`flutter_bluetooth_printer_web` - `v1.1.1`](#flutter_bluetooth_printer_web---v111)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.17.1`
+
+ - **FIX**(web): Throw Error when connecting connected Device .
+
+#### `flutter_bluetooth_printer_web` - `v1.1.1`
+
+ - **FIX**(web): Throw Error when connecting connected Device .
+
+
 ## 2024-10-26
 
 ### Changes

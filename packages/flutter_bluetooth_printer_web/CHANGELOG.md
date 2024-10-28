@@ -1,3 +1,7 @@
+## 1.1.1
+
+ - **FIX**(web): Throw Error when connecting connected Device .
+
 ## 1.1.0
 
  - **PERF**(docs): update readme.md.
