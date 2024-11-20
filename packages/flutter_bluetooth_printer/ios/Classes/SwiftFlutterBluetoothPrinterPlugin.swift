@@ -59,17 +59,17 @@ public class SwiftFlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, Flutte
 
           switch (call.method){
           case "getState":
-              if (!self.bluetoothPrinterManager.isAvailable){
-                  result(1)
-                  return
-              }
+              switch self.bluetoothPrinterManager.managerState {
 
-              if (!self.bluetoothPrinterManager.isPermitted){
+              case .unauthorized:
                   result(3)
-                  return
+              case .poweredOff:
+                  result(1)
+              case .poweredOn:
+                  result(2)
+              @unknown default:
+                  result(0) 
               }
-
-              result(2)
               break
 
           case "connect":

@@ -86,9 +86,9 @@ public class BluetoothPrinterManager {
 
     private var connectTimer: Timer?
     
-    public var isPermitted: Bool {
+    public var managerState: CBManagerState {
         get {
-            return centralManager.state != .unauthorized
+            return centralManager.state
         }
     }
     
