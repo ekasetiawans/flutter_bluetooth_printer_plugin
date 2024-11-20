@@ -53,6 +53,10 @@ class BluetoothCentralManagerDelegate: NSObject, CBCentralManagerDelegate {
             }
         }
     }
+    
+    public func resetDiscoveredPeripherals() {
+        discoveredPeripherals.removeAll()
+    }
 
     convenience init(_ services: Set<String>) {
         self.init()
