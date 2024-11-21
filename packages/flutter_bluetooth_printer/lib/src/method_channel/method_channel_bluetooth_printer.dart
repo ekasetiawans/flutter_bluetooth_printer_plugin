@@ -8,7 +8,12 @@ class BluetoothDisabledState extends DiscoveryState {}
 
 class BluetoothEnabledState extends DiscoveryState {}
 
+class UnsupportedBluetoothState extends DiscoveryState {}
+
 class MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
+  MethodChannelBluetoothPrinter();
+
+  // DartPluginRegistrant registrar
   static void registerWith() {
     FlutterBluetoothPrinterPlatform.instance = MethodChannelBluetoothPrinter();
   }

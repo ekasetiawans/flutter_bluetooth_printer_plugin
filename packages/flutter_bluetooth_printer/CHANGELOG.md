@@ -1,3 +1,14 @@
+## 2.17.1
+
+ - **FIX**(web): Throw Error when connecting connected Device .
+
+## 2.17.0
+
+ - **FIX**: melos.
+ - **FIX**(android): error cannot build because importing web platform .
+ - **FEAT**: added support web.
+ - **FEAT**(web): discovery and request LEScan finded .
+
 ## 2.16.10
 
  - **FIX**: android connectivity.

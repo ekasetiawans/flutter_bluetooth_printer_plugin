@@ -103,9 +103,13 @@ class FlutterBluetoothPrinter {
       // waiting for printer initialized and buffers cleared
       await Future.delayed(const Duration(milliseconds: 400));
 
-      final additional = <int>[
-        for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
-      ];
+      final additional = paperSize == PaperSize.mm58
+          ? <int>[
+              for (int i = 0; i < addFeeds; i++) ...Commands.carriageReturn,
+            ]
+          : <int>[
+              for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
+            ];
 
       final printResult = await printBytes(
         keepConnected: true,
