@@ -33,6 +33,10 @@ class ReceiptController with ChangeNotifier {
       delayTime: delayTime,
     );
   }
+
+  Future<Uint8List> getImageBytes() {
+    return _state.getImageBytes();
+  }
 }
 
 class Receipt extends StatefulWidget {
