@@ -178,6 +178,22 @@ class ReceiptState extends State<Receipt> {
       delayTime: delayTime,
     );
   }
+
+  /*
+  Get the PNG bytes of the receipt image.
+  */
+  Future<Uint8List> getImageBytes() async {
+    final RenderRepaintBoundary boundary =
+        _localKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+
+    final screenWidth = boundary.size.width;
+    double quality = _paperSize.width / screenWidth;
+
+    final image = await boundary.toImage(pixelRatio: quality);
+    final byteData = await image.toByteData(format: ImageByteFormat.png);
+    var bytes = byteData!.buffer.asUint8List();
+    return bytes;
+  }
 }
 
 class _ImagePreviewForDebug extends StatelessWidget {
