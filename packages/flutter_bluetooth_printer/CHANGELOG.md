@@ -1,3 +1,7 @@
+## 2.18.0
+
+ - **FEAT**: added getImageBytes.
+
 ## 2.17.1
 
  - **FIX**(web): Throw Error when connecting connected Device .
