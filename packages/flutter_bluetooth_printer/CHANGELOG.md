@@ -1,3 +1,7 @@
+## 2.19.0
+
+ - **FEAT**: getImageBytes from controller.
+
 ## 2.18.0
 
  - **FEAT**: added getImageBytes.

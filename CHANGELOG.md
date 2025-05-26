@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_bluetooth_printer` - `v2.19.0`](#flutter_bluetooth_printer---v2190)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.19.0`
+
+ - **FEAT**: getImageBytes from controller.
+
+
+## 2025-05-26
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_bluetooth_printer` - `v2.18.0`](#flutter_bluetooth_printer---v2180)
 
 ---
