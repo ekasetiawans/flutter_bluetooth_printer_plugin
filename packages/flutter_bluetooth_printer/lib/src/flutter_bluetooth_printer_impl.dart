@@ -90,6 +90,7 @@ class FlutterBluetoothPrinter {
     PaperSize paperSize = PaperSize.mm58,
     ProgressCallback? onProgress,
     int addFeeds = 0,
+    bool cutPaper = false,
     bool useImageRaster = true,
     required bool keepConnected,
     int maxBufferSize = 512,
@@ -127,6 +128,7 @@ class FlutterBluetoothPrinter {
           ...imageData,
           ...reset,
           ...additional,
+          if (cutPaper) ...Commands.cutPaper
         ]),
         onProgress: onProgress,
         maxBufferSize: maxBufferSize,
