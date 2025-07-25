@@ -20,6 +20,7 @@ class ReceiptController with ChangeNotifier {
 
     /// add lines after print
     int addFeeds = 0,
+    bool cutPaper = true,
     bool keepConnected = false,
     int maxBufferSize = 512,
     int delayTime = 120,
@@ -28,6 +29,7 @@ class ReceiptController with ChangeNotifier {
       address: address,
       onProgress: onProgress,
       addFeeds: addFeeds,
+      cutPaper: cutPaper,
       keepConnected: keepConnected,
       maxBufferSize: maxBufferSize,
       delayTime: delayTime,
@@ -155,6 +157,7 @@ class ReceiptState extends State<Receipt> {
     required String address,
     ProgressCallback? onProgress,
     int addFeeds = 0,
+    bool cutPaper = false,
     bool keepConnected = false,
     int maxBufferSize = 512,
     int delayTime = 120,
@@ -177,6 +180,7 @@ class ReceiptState extends State<Receipt> {
       paperSize: _paperSize,
       onProgress: onProgress,
       addFeeds: addFeeds,
+      cutPaper: cutPaper,
       keepConnected: keepConnected,
       maxBufferSize: bytes.length,
       delayTime: delayTime,
