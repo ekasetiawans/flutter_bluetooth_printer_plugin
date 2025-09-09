@@ -1,3 +1,7 @@
+## 2.20.0
+
+ - **FEAT**: updated compileSdkVersion to 36.
+
 ## 2.19.0
 
  - **FEAT**: getImageBytes from controller.

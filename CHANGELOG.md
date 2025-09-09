@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-09-10
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.20.0`](#flutter_bluetooth_printer---v2200)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.20.0`
+
+ - **FEAT**: updated compileSdkVersion to 36.
+
+
 ## 2025-05-26
 
 ### Changes
