@@ -1,3 +1,7 @@
+## 2.23.0
+
+ - **FEAT**: add support Swift Package Manager.
+
 ## 2.20.0
 
  - **FEAT**: updated compileSdkVersion to 36.
