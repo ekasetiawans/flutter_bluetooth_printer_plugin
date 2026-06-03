@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-06-03
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_bluetooth_printer` - `v2.21.0`](#flutter_bluetooth_printer---v2210)
+
+---
+
+#### `flutter_bluetooth_printer` - `v2.21.0`
+
+ - **FEAT**: add support Swift Package Manager.
+
+
 ## 2025-09-10
 
 ### Changes
