@@ -1,3 +1,8 @@
+## 2.24.0
+
+ - **FEAT**: support swift package manager.
+ - **FEAT**: support swift package manager.
+
 ## 2.23.0
 
  - **FEAT**: add support Swift Package Manager.
