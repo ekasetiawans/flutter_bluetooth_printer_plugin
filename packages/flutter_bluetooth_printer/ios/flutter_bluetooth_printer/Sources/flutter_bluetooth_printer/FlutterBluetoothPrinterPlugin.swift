@@ -50,7 +50,7 @@ public class FlutterBluetoothPrinterPlugin: NSObject, FlutterPlugin, FlutterStre
     }
 
   public static func register(with registrar: FlutterPluginRegistrar) {
-      SwiftFlutterBluetoothPrinterPlugin.instance = SwiftFlutterBluetoothPrinterPlugin(binaryMessenger: registrar.messenger())
+      FlutterBluetoothPrinterPlugin.instance = FlutterBluetoothPrinterPlugin(binaryMessenger: registrar.messenger())
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

@@ -1,22 +1,16 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_bluetooth_printer (2.0.0):
-    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - flutter_bluetooth_printer (from `.symlinks/plugins/flutter_bluetooth_printer/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  flutter_bluetooth_printer:
-    :path: ".symlinks/plugins/flutter_bluetooth_printer/ios"
 
 SPEC CHECKSUMS:
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_bluetooth_printer: 03d6206c1cb42dc233d3d30b0071fac068c184fd
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
 
-PODFILE CHECKSUM: c4c93c5f6502fe2754f48404d3594bf779584011
+PODFILE CHECKSUM: 0dbd5a87e0ace00c9610d2037ac22083a01f861d
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.16.2
