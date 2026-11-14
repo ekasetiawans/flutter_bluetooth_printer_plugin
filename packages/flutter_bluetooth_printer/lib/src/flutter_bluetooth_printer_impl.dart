@@ -117,7 +117,7 @@ class FlutterBluetoothPrinter {
         return false;
       }
 
-      // Tunggu sisa jeda saja, bukan 400 ms penuh.
+      // waiting for printer initialized and buffers cleared
       final remaining = const Duration(milliseconds: 400) -
           DateTime.now().difference(init.at);
       if (remaining > Duration.zero) {
