@@ -169,8 +169,8 @@ class ReceiptState extends State<Receipt> {
     double quality = _paperSize.width / screenWidth;
 
     final image = await boundary.toImage(pixelRatio: quality);
-    final byteData = await image.toByteData(format: ImageByteFormat.png);
-    var bytes = byteData!.buffer.asUint8List();
+    final byteData = await image.toByteData(format: ImageByteFormat.rawRgba);
+    final bytes = byteData!.buffer.asUint8List();
 
     return FlutterBluetoothPrinter.printImageSingle(
       address: address,

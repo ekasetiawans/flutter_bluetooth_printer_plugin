@@ -49,39 +49,31 @@ class Generator {
   Future<List<int>> rasterImage({
     required Uint8List bytes,
     required int dotsPerLine,
+    int? sourceWidth,
+    int? sourceHeight,
   }) async {
     // need to convert to JPG
     // iOS issue, when using PNG the output is broken
 
-    final newBytes = img.encodeJpg(img.decodePng(bytes)!);
-    img.Image src = img.decodeJpg(newBytes)!;
-    src = img.copyResize(
-      src,
-      width: dotsPerLine,
-      maintainAspect: true,
-      backgroundColor: img.ColorRgba8(255, 255, 255, 255),
-      interpolation: img.Interpolation.cubic,
+    final source = RasterSource.from(
+      bytes,
+      sourceWidth: sourceWidth,
+      sourceHeight: sourceHeight,
+    ).fitToWidth(dotsPerLine);
+
+    final rasterData = RasterPacker.pack(
+      rgba: source.rgba,
+      width: source.width,
+      height: source.height,
+      premultipliedAlpha: source.premultipliedAlpha,
     );
-    src = img.grayscale(src);
 
-    final int widthPx = src.width;
-    final int widthBytes = widthPx ~/ 8;
-    final int heightPx = src.height;
-
-    final list = _toRasterFormat(src);
-
-    const int densityByte = 0;
-    final List<int> header = <int>[
-      ...cRasterImg2.codeUnits,
-    ];
-    header.add(densityByte);
-    header.addAll(_intLowHigh(widthBytes, 2)); // xL xH
-    header.addAll(_intLowHigh(heightPx, 2));
-
-    return <int>[
-      ...header,
-      ...list,
-    ];
+    return RasterCommandBuilder.build(
+      commandPrefix: cRasterImg2.codeUnits,
+      rasterData: rasterData,
+      widthPx: source.width,
+      heightPx: source.height,
+    );
   }
 
   List<int> _graphic(img.Image image) {
@@ -222,12 +214,11 @@ class Generator {
   }
 
   Future<List<int>> _encodeX(Map<String, dynamic> arg) async {
-    final dotsPerLine = arg['dotsPerLine'];
-    final pngBytes = arg['bytes'];
-
     return rasterImage(
-      bytes: pngBytes,
-      dotsPerLine: dotsPerLine,
+      bytes: arg['bytes'],
+      dotsPerLine: arg['dotsPerLine'],
+      sourceWidth: arg['sourceWidth'],
+      sourceHeight: arg['sourceHeight'],
     );
   }
 
@@ -235,11 +226,15 @@ class Generator {
     required Uint8List bytes,
     required int dotsPerLine,
     required bool useImageRaster,
+    int? sourceWidth,
+    int? sourceHeight,
   }) {
     final arg = {
       'bytes': bytes,
       'dotsPerLine': dotsPerLine,
       'useImageRaster': useImageRaster,
+      'sourceWidth': sourceWidth,
+      'sourceHeight': sourceHeight,
     };
 
     return compute(_encodeX, arg);
