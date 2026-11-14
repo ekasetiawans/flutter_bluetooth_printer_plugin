@@ -2,7 +2,7 @@ library flutter_bluetooth_printer_platform_interface;
 
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 typedef ProgressCallback = void Function(int total, int sent);

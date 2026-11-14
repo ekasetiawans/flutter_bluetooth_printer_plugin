@@ -106,9 +106,11 @@ class FlutterBluetoothPrinter {
         useImageRaster: useImageRaster,
       );
 
-      await _initialize(
-        address: address,
-      );
+      final initialized = await _initialize(address: address);
+      if (!initialized) {
+        debugPrint('Bluetooth printer: initialization failed');
+        return false;
+      }
 
       // waiting for printer initialized and buffers cleared
       await Future.delayed(const Duration(milliseconds: 400));
@@ -137,6 +139,7 @@ class FlutterBluetoothPrinter {
 
       return printResult;
     } catch (e) {
+      debugPrint('Bluetooth printer: image print failed (${e.runtimeType})');
       return false;
     } finally {
       if (!keepConnected) {

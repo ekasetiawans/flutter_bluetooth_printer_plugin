@@ -182,7 +182,7 @@ class ReceiptState extends State<Receipt> {
       addFeeds: addFeeds,
       cutPaper: cutPaper,
       keepConnected: keepConnected,
-      maxBufferSize: bytes.length,
+      maxBufferSize: maxBufferSize,
       delayTime: delayTime,
     );
   }
@@ -207,7 +207,6 @@ class ReceiptState extends State<Receipt> {
 class _ImagePreviewForDebug extends StatelessWidget {
   final Uint8List bytes;
   const _ImagePreviewForDebug({
-    super.key,
     required this.bytes,
   });
 

@@ -141,15 +141,16 @@ class MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
         'max_buffer_size': maxBufferSize,
       });
 
-      _progressCallback = null;
       if (res is bool) {
         return res;
       }
 
       return false;
     } catch (e) {
+      debugPrint('Bluetooth printer: write failed (${e.runtimeType})');
       return false;
     } finally {
+      _progressCallback = null;
       _isBusy = false;
     }
   }
@@ -188,6 +189,7 @@ class MethodChannelBluetoothPrinter extends FlutterBluetoothPrinterPlatform {
 
       return false;
     } catch (e) {
+      debugPrint('Bluetooth printer: connection failed (${e.runtimeType})');
       return false;
     } finally {
       _isBusy = false;
