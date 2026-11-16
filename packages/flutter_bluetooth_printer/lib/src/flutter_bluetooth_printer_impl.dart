@@ -100,18 +100,29 @@ class FlutterBluetoothPrinter {
       final generator = Generator();
       final reset = generator.reset();
 
+      final initialization = _initialize(address: address)
+          .then((ok) => (ok: ok, at: DateTime.now()));
+
       final imageData = await generator.encode(
         bytes: imageBytes,
         dotsPerLine: paperSize.width,
         useImageRaster: useImageRaster,
+        sourceWidth: imageWidth,
+        sourceHeight: imageHeight,
       );
 
-      await _initialize(
-        address: address,
-      );
+      final init = await initialization;
+      if (!init.ok) {
+        debugPrint('Bluetooth printer: initialization failed');
+        return false;
+      }
 
       // waiting for printer initialized and buffers cleared
-      await Future.delayed(const Duration(milliseconds: 400));
+      final remaining = const Duration(milliseconds: 400) -
+          DateTime.now().difference(init.at);
+      if (remaining > Duration.zero) {
+        await Future.delayed(remaining);
+      }
 
       final additional = paperSize == PaperSize.mm58
           ? <int>[
@@ -121,22 +132,26 @@ class FlutterBluetoothPrinter {
               for (int i = 0; i < addFeeds; i++) ...Commands.lineFeed,
             ];
 
+      final builder = BytesBuilder(copy: false)
+        ..add(imageData)
+        ..add(reset)
+        ..add(additional);
+      if (cutPaper) builder.add(Commands.cutPaper);
+
+      final data = builder.takeBytes();
+
       final printResult = await printBytes(
         keepConnected: true,
         address: address,
-        data: Uint8List.fromList([
-          ...imageData,
-          ...reset,
-          ...additional,
-          if (cutPaper) ...Commands.cutPaper
-        ]),
+        data: data,
         onProgress: onProgress,
         maxBufferSize: maxBufferSize,
         delayTime: delayTime,
       );
 
       return printResult;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('Bluetooth printer: image print failed ($e)\n$stackTrace');
       return false;
     } finally {
       if (!keepConnected) {

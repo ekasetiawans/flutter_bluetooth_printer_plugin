@@ -169,8 +169,8 @@ class ReceiptState extends State<Receipt> {
     double quality = _paperSize.width / screenWidth;
 
     final image = await boundary.toImage(pixelRatio: quality);
-    final byteData = await image.toByteData(format: ImageByteFormat.png);
-    var bytes = byteData!.buffer.asUint8List();
+    final byteData = await image.toByteData(format: ImageByteFormat.rawRgba);
+    final bytes = byteData!.buffer.asUint8List();
 
     return FlutterBluetoothPrinter.printImageSingle(
       address: address,
@@ -182,7 +182,7 @@ class ReceiptState extends State<Receipt> {
       addFeeds: addFeeds,
       cutPaper: cutPaper,
       keepConnected: keepConnected,
-      maxBufferSize: bytes.length,
+      maxBufferSize: maxBufferSize,
       delayTime: delayTime,
     );
   }
@@ -207,7 +207,6 @@ class ReceiptState extends State<Receipt> {
 class _ImagePreviewForDebug extends StatelessWidget {
   final Uint8List bytes;
   const _ImagePreviewForDebug({
-    super.key,
     required this.bytes,
   });
 
